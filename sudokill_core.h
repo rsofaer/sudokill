@@ -14,8 +14,8 @@ namespace sudokill
 template<typename PointType>
 struct Point
 {
-  Point(PointType x_,
-        PointType y_)
+  Point(const PointType x_,
+        const PointType y_)
   : x(x_),
     y(y_)
   {}
@@ -63,8 +63,8 @@ struct GenericBoard
    */
   inline void PlayMove(Point<PointType> p, int value)
   {
-    //assert(p.x >= 0 && p.x <= MaxX);
-    //assert(p.y >= 0 && p.y <= MaxY);
+    assert(p.x >= 0 && p.x <= MaxX);
+    assert(p.y >= 0 && p.y <= MaxY);
     
     typename Positions::iterator pos = std::find(positions.begin(),positions.end(),p);
     
@@ -107,14 +107,31 @@ struct GenericBoard
     return retVal;
   }
   
-  inline bool ValidMove(Point<PointType> p, int value)
+  bool ValidMove(Point<PointType> p, int value)
   {
+    assert(p.x >=0 && p.x <= MaxX);
+    assert(p.y >= 0 && p.y <= MaxY);
+    
+    return (isValidRow(p, value) &&
+	    isValidColumn(p, value) &&
+	    isValidGrid(p, value);
+  }
+
+  bool isValidRow(Point<PointType> p, int value);
+  bool isValidColumn(Point<PointType> p, int value);
+  bool isValidGrid(Point<PointType> p, int value);
+  //{
+    
     //TODO:
     // check if row is valid
     // check if column is valid.
     // check if grid is valid.
-  }
+  //}
 };
+
+template <typename PointType>
+typedef GenericBoard<int,int,PointType> Board;
+
 }
 }
 
