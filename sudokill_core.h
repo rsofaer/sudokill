@@ -23,15 +23,21 @@ struct Point
   PointType x;
   PointType y;
   
-  Point operator+(const Point& rhs) const
+  Point operator+(const Point& lhs, const Point& rhs) const
   {
-    return Point(x+rhs.x, y+rhs.y);
+    return Point(lhs.x+rhs.x, lhs.y+rhs.y);
   }
   
-  bool operator==(const Point& rhs) const
+  bool operator==(const Point& lhs, const Point& rhs) const
   {
     return (x == rhs.x && y == rhs.y);
   }
+  
+  bool operator<=(const Point& lhs, const Point& rhs)
+  {
+    return (lhs.x <= rhs.x && lhs.y <= rhs.y);
+  }
+  
 };
 
 template <typename PointType>
@@ -112,14 +118,16 @@ struct GenericBoard
     assert(p.x >=0 && p.x <= MaxX);
     assert(p.y >= 0 && p.y <= MaxY);
     
-    return (isValidRow(p, value) &&
+    return (isEmpty(p) &&
+	    isValidRow(p, value) &&
 	    isValidColumn(p, value) &&
 	    isValidGrid(p, value);
   }
 
-  bool isValidRow(Point<PointType> p, int value);
-  bool isValidColumn(Point<PointType> p, int value);
-  bool isValidGrid(Point<PointType> p, int value);
+  bool isEmpty(const Point<PointType>& p);
+  bool isValidRow(const Point<PointType>& p, int value);
+  bool isValidColumn(const Point<PointType>& p, int value);
+  bool isValidGrid(const Point<PointType>& p, int value);
   //{
     
     //TODO:
