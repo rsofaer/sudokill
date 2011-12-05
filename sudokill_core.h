@@ -60,8 +60,7 @@ struct GenericBoard
   // max y value.
   enum {MaxY = MaxY_,};
   
-  typedef std::vector<Cell<PointType> > Positions;
-  Positions positions;
+  std::vector<Cell<PointType> > positions;
   
   /*
    <summary> This function puts the value at a point</summary>
@@ -72,7 +71,7 @@ struct GenericBoard
     assert(p.x >= 0 && p.x <= MaxX);
     assert(p.y >= 0 && p.y <= MaxY);
     
-    typename Positions::iterator pos = std::find(positions.begin(),positions.end(),p);
+    typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(),positions.end(),p);
     
     //assert if position occupied.
     assert(pos == positions.end());
@@ -103,7 +102,7 @@ struct GenericBoard
     assert(p.y >= 0 && p.y <= MaxY);
     int retVal = -1;
     
-    typename Positions::iterator pos = std::find(positions.begin(),positions.end(),p);
+    typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(),positions.end(),p);
     
     if(positions != positions.end())
     {
@@ -124,22 +123,102 @@ struct GenericBoard
 	    isValidGrid(p, value));
   }
 
-  bool isEmpty(const Point<PointType>& p);
-  bool isValidRow(const Point<PointType>& p, int value);
-  bool isValidColumn(const Point<PointType>& p, int value);
-  bool isValidGrid(const Point<PointType>& p, int value);
-  //{
+  bool isValidRow(const Point<PointType>& p, int value)
+  {
+    typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
+    for(; pos != positions.end();++pos)
+    {
+      if((*pos).location.y == p.y && (*pos).value == value)
+      {
+	return false;
+      }
+    }
+    return true;
+  }
+  
+  bool isValidColumn(const Point<PointType>& p, int value)
+  {
+    typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
+    for(; pos != positions.end();++pos)
+    {
+      if((*pos).location.x == p.x && (*pos).value == value)
+      {
+	return false;
+      }
+    }
+    return true;
+  }
+
+  bool isEmpty(const Point<PointType>& p)
+  {
+    typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(), positions.end(), p);
+    assert(pos == positions.end());
+    return true;
+  }
+
+  bool isValidGrid(const Point<PointType>& p, int value)
+  {
+    assert(p.x >=0 && p.x <= MaxX);
+    assert(p.y >=0 && p.y <= MaxY);
+    int gridMinX, gridMaxX;
+    int gridMinY, gridMaxY;
     
-    //TODO:
-    // check if row is valid
-    // check if column is valid.
-    // check if grid is valid.
-  //}
+    int gridNumber = GridNumber(p);
+    switch(gridNumber)
+    {
+    case 1:
+      gridMinX = 0; gridMaxX = 2; gridMinY = 0; gridMaxY = 2; 
+      break;
+    case 2:
+      gridMinX = 3; gridMaxX = 5; gridMinY = 0; gridMaxY = 2;
+      break;
+    case 3:
+      gridMinX = 6; gridMaxX = 8; gridMinY = 0; gridMaxY = 2; 
+      break;
+    case 4:
+      gridMinX = 0; gridMaxX = 2; gridMinY = 3; gridMaxY = 5;
+      break;
+    case 5:
+      gridMinX = 3; gridMaxX = 5; gridMinY = 3; gridMaxY = 5; 
+      break;
+    case 6:
+      gridMinX = 6; gridMaxX = 8; gridMinY = 3; gridMaxY = 5;
+      break;
+    case 7:
+      gridMinX = 0; gridMaxX = 2; gridMinY = 6; gridMaxY = 8; 
+      break;
+    case 8:
+      gridMinX = 3; gridMaxX = 5; gridMinY = 6; gridMaxY = 8;
+      break;
+    case 9:
+      gridMinX = 6; gridMaxX = 8; gridMinY = 6; gridMaxY = 8; 
+      break;
+    }
+    
+    Point<PointType> pMin(gridMinX,gridMinY);
+    Point<PointType> pMax(gridMaxX,gridMaxY);
+    
+    typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
+    for(; pos != positions.end(); ++pos)
+    {
+      if((*pos).location >= pMin && (*pos).location <= pMax && (*pos).value == value)
+      {
+	return false;
+      }
+    }
+    
+    return true;
+    
+  }
+
+  int GridNumber(const Point<PointType>& p)
+  {
+    int x = (p.x)/3;
+    int y = (p.y)/3;
+    return (y*3 + x + 1);
+  }
 
 };
-
-template <typename PointType>
-typedef GenericBoard<int,int,PointType> Board;
 
 }
 }
