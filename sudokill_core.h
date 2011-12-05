@@ -23,19 +23,19 @@ struct Point
   PointType x;
   PointType y;
   
-  Point operator+(const Point& lhs, const Point& rhs) const
+  Point operator+(const Point& rhs) const
   {
-    return Point(lhs.x+rhs.x, lhs.y+rhs.y);
+    return Point(this.x+rhs.x, this.y+rhs.y);
   }
   
-  bool operator==(const Point& lhs, const Point& rhs) const
+  bool operator==(const Point& rhs) const
   {
-    return (x == rhs.x && y == rhs.y);
+    return (this.x == rhs.x && this.y == rhs.y);
   }
   
-  bool operator<=(const Point& lhs, const Point& rhs)
+  bool operator<=(const Point& rhs)
   {
-    return (lhs.x <= rhs.x && lhs.y <= rhs.y);
+    return (this.x <= rhs.x && this.y <= rhs.y);
   }
   
 };
@@ -121,7 +121,7 @@ struct GenericBoard
     return (isEmpty(p) &&
 	    isValidRow(p, value) &&
 	    isValidColumn(p, value) &&
-	    isValidGrid(p, value);
+	    isValidGrid(p, value));
   }
 
   bool isEmpty(const Point<PointType>& p);
@@ -135,6 +135,7 @@ struct GenericBoard
     // check if column is valid.
     // check if grid is valid.
   //}
+
 };
 
 template <typename PointType>

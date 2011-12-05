@@ -16,22 +16,21 @@ endif(UNIX)
 #   sudokill_core - shared objects for sudokill
 project(sudokill_core)
 set(SRCS
-    "sudokill_diagram_generator.cpp"
     "sudokill_core.cpp")
 add_library(sudokill_core STATIC ${SRCS} ${HEADERS})
 
-# Executable targets:
-#   sudokill - the main solution
-#   sudokill_gtest - all tests
-
-project(sudokill)
-set(SRCS
-    "sudokill.cpp")
-add_executable(sudokill ${SRCS} ${HEADERS})
-target_link_libraries(sudokill sudokill_core)
-if(WIN32)
-	target_link_libraries(sudokill Ws2_32)
-endif(WIN32)
+## Executable targets:
+##   sudokill - the main solution
+##   sudokill_gtest - all tests
+#
+#project(sudokill)
+#set(SRCS
+#    "sudokill.cpp")
+#add_executable(sudokill ${SRCS} ${HEADERS})
+#target_link_libraries(sudokill sudokill_core)
+#if(WIN32)
+#	target_link_libraries(sudokill Ws2_32)
+#endif(WIN32)
 
 if(HPS_GTEST_ENABLED)
   project(sudokill_gtest)
