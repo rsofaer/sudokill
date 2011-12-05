@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <assert.h>
 
 namespace hps 
 {
@@ -25,17 +26,17 @@ struct Point
   
   Point operator+(const Point& rhs) const
   {
-    return Point(this.x+rhs.x, this.y+rhs.y);
+    return Point(x+rhs.x, y+rhs.y);
   }
   
   bool operator==(const Point& rhs) const
   {
-    return (this.x == rhs.x && this.y == rhs.y);
+    return (x == rhs.x && y == rhs.y);
   }
-  
+
   bool operator<=(const Point& rhs)
   {
-    return (this.x <= rhs.x && this.y <= rhs.y);
+    return (x <= rhs.x && y <= rhs.y);
   }
   
 };
@@ -48,6 +49,13 @@ struct Cell
   : location(location_),
     value(value_)
   {}
+
+  // RJS 5/12:  I feel like I shouldn't be doing this.  We use it in ValueAt.
+  bool operator==(const Point<PointType>& rhs) const
+  {
+    return (location == rhs);
+  }
+
   Point<PointType> location;
   int value;
 };
@@ -59,6 +67,8 @@ struct GenericBoard
   enum {MaxX = MaxX_,};
   // max y value.
   enum {MaxY = MaxY_,};
+
+  enum {Empty = -1,};
   
   std::vector<Cell<PointType> > positions;
   
@@ -100,11 +110,11 @@ struct GenericBoard
   {
     assert(p.x >= 0 && p.x <= MaxX);
     assert(p.y >= 0 && p.y <= MaxY);
-    int retVal = -1;
+    int retVal = Empty;
     
     typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(),positions.end(),p);
     
-    if(positions != positions.end())
+    if(pos != positions.end())
     {
       retVal = (*pos).value;
     }
