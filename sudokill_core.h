@@ -47,14 +47,24 @@ struct Cell
     value(value_)
   {}
 
+  inline bool operator==(const Cell& rhs) const
+  {
+    return (location == rhs.location) && (value == rhs.value);
+  }
+  inline bool operator!=(const Cell& rhs) const
+  {
+    return !(*this == rhs);
+  }
+
   Point location;
   int value;
 };
   
 /// <summary> A board is a grid of cells. </summary>
 template<int MaxX_, int MaxY_>
-struct GenericBoard
+class GenericBoard
 {
+public:
   // max x value.
   enum {MaxX = MaxX_,};
   // max y value.
@@ -65,10 +75,14 @@ struct GenericBoard
   enum { MaxValue = 9, };
 
   typedef std::vector<Cell> MoveList;
-  
-  /// <summary> List of occupied board cells. </summary>
-  MoveList positions;
 
+  GenericBoard() : positions(), playerMoveCount(0) {}
+  /// <summary> Initialize with a list of preset cells. </summary>
+  explicit GenericBoard(const MoveList& preset)
+  : positions(preset),
+    playerMoveCount(0)
+  {}
+  
   /// <summary> Predicate to test that a move is at a given point. </summary>
   struct MoveMatchesPoint
   {
@@ -91,12 +105,14 @@ struct GenericBoard
     assert(p.x >= 0 && p.x < MaxX);
     assert(p.y >= 0 && p.y < MaxY);
     assert(IsValidMove(p, value));
+    assert(playerMoveCount >= 0);
     
     //assert if position occupied.
     assert(!Occupied(p));
     
     //position is set by creating an object of type Cell.
     positions.push_back(Cell(p,value));
+    ++playerMoveCount;
   }
 
   inline void PlayMove(const Cell& c)
@@ -112,6 +128,7 @@ struct GenericBoard
     assert(!positions.empty());
     // the last value played is put at the back.
     positions.pop_back();
+    --playerMoveCount;
   }
   
   /// <summary> This function returns the value at a point</summary>
@@ -398,12 +415,17 @@ struct GenericBoard
   void ValidMoves(MoveList* moveBuffer) const
   {
     assert(moveBuffer);
+    assert(playerMoveCount >= 0);
+
     SudokuValidMoves(moveBuffer);
-    MoveList sudokuMoves(*moveBuffer);
-    moveBuffer->erase(remove_if(moveBuffer->begin(), 
-                                moveBuffer->end(),
-                                IsNotSameRowOrColumn(this, sudokuMoves)),
-                      moveBuffer->end());
+    if (playerMoveCount > 0)
+    {
+      MoveList sudokuMoves(*moveBuffer);
+      moveBuffer->erase(remove_if(moveBuffer->begin(), 
+                                  moveBuffer->end(),
+                                  IsNotSameRowOrColumn(this, sudokuMoves)),
+                        moveBuffer->end());
+    }
   }
 
   /// <summary> Find any unoccupied cell and make a move for it. </summary>
@@ -443,6 +465,31 @@ struct GenericBoard
     std::cout << "8|" << ValueAt(Point(8,0)) << ValueAt(Point(8,1)) << ValueAt(Point(8,2))<<"|" << ValueAt(Point(8,3)) << ValueAt(Point(8,4)) << ValueAt(Point(8,5)) <<"|"<< ValueAt(Point(8,6)) << ValueAt(Point(8,7)) << ValueAt(Point(8,8)) << "|" << std::endl;
     std::cout << " |---|---|---  " << std::endl;
   }
+
+  /// <summary> Query number of moves made by players. </summary>
+  inline int NumberPlayerMoves() const
+  {
+    return playerMoveCount;
+  }
+
+  /// <summary> Query the cells occupied. </summary>
+  inline const MoveList& GetOccupied() const
+  {
+    return positions;
+  }
+
+  /// <summary> Query the last move. </summary>
+  inline const Cell& LastMove() const
+  {
+    assert(playerMoveCount > 0);
+    return positions.back();
+  }
+
+private:
+  /// <summary> List of occupied board cells. </summary>
+  MoveList positions;
+  /// <summary> Number of moves made by players. </summary>
+  int playerMoveCount;
 };
 
 typedef sudokill::GenericBoard<9, 9> Board;
