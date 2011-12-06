@@ -246,13 +246,18 @@ struct GenericBoard
     }
     pNW->x = boxMinX; pNW->y = boxMinY;
     pSE->x = boxMaxX; pSE->y = boxMaxY;
+    std::cout << "boxminx: " << boxMinX << std::endl;
+    std::cout << "boxminy: " << boxMinY << std::endl;
+    std::cout << "boxmaxx: " << boxMaxX << std::endl;
+    std::cout << "boxmaxy: " << boxMaxY << std::endl;
   }
   bool isValidBox(const Point<PointType>& p, int value)
   {
     assert(p.x >=0 && p.x < MaxX);
     assert(p.y >=0 && p.y < MaxY);
-    
+    std::cout << "value: " << value <<std::endl;
     int boxNumber = BoxNumber(p);
+    std::cout << "box Number: " << boxNumber <<std::endl;
     Point<PointType> pNW;
     Point<PointType> pSE;
     getBoundingBox(boxNumber,&pNW,&pSE);

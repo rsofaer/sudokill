@@ -99,7 +99,12 @@ TEST(GenericBoard, isValidBox)
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
   board.PlayMove(Point(0,0), 1);
   EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
+  EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
+  board.PlayMove(Point(4,3), 4);
+  EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
+
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
+
 }
 
 TEST(GenericBoard, BoxNumber)
