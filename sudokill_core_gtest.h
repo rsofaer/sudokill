@@ -162,6 +162,9 @@ TEST(GenericBoard, getBoundingBox)
 TEST(GenericBoard, ValidMoves)
 {
   Board board;
+  Board::move_list_type moves;
+  board.ValidMoves(&moves);
+  EXPECT_EQ(moves.size(), Board::MaxX * Board::MaxY * (Board::MaxValue - Board::MinValue));
 }
 
 }

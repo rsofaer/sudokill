@@ -294,7 +294,7 @@ struct GenericBoard
           if(isValidMove(p, v))
           {
             Cell<PointType> c(p,v);
-            moveBuffer.push(c);
+            moveBuffer->push_back(c);
           }
         }
       }
