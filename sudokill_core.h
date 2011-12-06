@@ -371,6 +371,24 @@ struct GenericBoard
                                 IsNotSameRowOrColumn(this)),
                       moveBuffer->end());
   }
+
+  void RandomEmptyCell(Cell* c)
+  {
+    Point p(0,0);
+    for(int x = 0; x < MaxX; x++)
+    {
+      for(int y = 0; y < MaxY; y++)
+      {
+        p.x = x;
+        p.y = y;
+        if(isEmpty(p))
+        {
+          c.location = p;
+          c.value = math::RandBound(MaxValue + 1);
+        }
+      }
+    }
+  }
 };
 
 typedef sudokill::GenericBoard<9, 9> Board;
