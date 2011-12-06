@@ -55,6 +55,64 @@ TEST(GenericBoard, isValidMove)
   EXPECT_TRUE(board.isValidMove(Point(Board::MaxX-1,Board::MaxY-1), 9));
 }
 
+TEST(GenericBoard, BoxNumber)
+{
+  Board board;
+  //point(2,2), grid:1;
+  //point(3,1), grid:2;
+  //point(4,5), grid:5; 
+  //point(6,3), grid:6;
+  //point(5,4), grid:5
+  /*
+     0 1 2 3 4 5 6 7 8
+     _________________
+   0|    |     |     |
+   1|  1 |  2  |  3  |
+   2|----|-----|-----|
+   3|    |     |     |
+   4|  4 |  5  |  6  |
+   5|----|-----|-----|
+   6|    |     |     |
+   7|  7 |  8  |  9  |
+   8|----|-----|-----|
+   */
+  EXPECT_EQ(board.BoxNumber(Point(2,2)),1);
+
+  EXPECT_EQ(board.BoxNumber(Point(3,1)),2);
+
+  EXPECT_EQ(board.BoxNumber(Point(6,1)),3);
+
+  EXPECT_EQ(board.BoxNumber(Point(2,5)),4);
+
+  EXPECT_EQ(board.BoxNumber(Point(4,5)),5);
+  EXPECT_EQ(board.BoxNumber(Point(5,4)),5);
+  EXPECT_EQ(board.BoxNumber(Point(3,3)),5);
+
+  EXPECT_EQ(board.BoxNumber(Point(6,3)),6);
+
+  EXPECT_EQ(board.BoxNumber(Point(1,6)),7);
+
+  EXPECT_EQ(board.BoxNumber(Point(4,7)),8);
+  EXPECT_EQ(board.BoxNumber(Point(3,6)),8);
+
+  EXPECT_EQ(board.BoxNumber(Point(6,6)),9);
+  EXPECT_EQ(board.BoxNumber(Point(7,6)),9); 
+}
+
+TEST(GenericBoard, getBoundingBox)
+{
+  Board board;
+  Point pNW(-1,-1);
+  Point pSE(9,9);
+  board.getBoundingBox(board.BoxNumber(Point(4,3)),&pNW,&pSE);
+  EXPECT_EQ(pNW.x,3);
+  EXPECT_EQ(pNW.y,3);
+  EXPECT_EQ(pSE.x,5);
+  EXPECT_EQ(pSE.y,5);
+  
+}
+
+
 }
 
 #endif //_HPS_SUDOKILL_CORE_GTEST_H_

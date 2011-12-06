@@ -15,6 +15,8 @@ namespace sudokill
 template<typename PointType>
 struct Point
 {
+  Point()
+  {}
   Point(const PointType x_,
         const PointType y_)
   : x(x_),
@@ -171,14 +173,13 @@ struct GenericBoard
     return (p.x >= NW.x) && (p.x >= NW.y) && (p.x <= SE.x) && (p.y <= SE.y); 
   }
 
-  bool isValidBox(const Point<PointType>& p, int value)
+  void getBoundingBox(int gridNumber, 
+		      Point<PointType>* pNW,
+		      Point<PointType>* pSE)
   {
-    assert(p.x >=0 && p.x < MaxX);
-    assert(p.y >=0 && p.y < MaxY);
     int gridMinX, gridMaxX;
     int gridMinY, gridMaxY;
     
-    int gridNumber = BoxNumber(p);
     switch(gridNumber)
     {
     case 1:
@@ -209,14 +210,23 @@ struct GenericBoard
       gridMinX = 6; gridMaxX = 8; gridMinY = 6; gridMaxY = 8; 
       break;
     }
+    pNW->x = gridMinX; pNW->y = gridMinY;
+    pSE->x = gridMaxX; pSE->y = gridMaxY;
+  }
+  bool isValidBox(const Point<PointType>& p, int value)
+  {
+    assert(p.x >=0 && p.x < MaxX);
+    assert(p.y >=0 && p.y < MaxY);
     
-    Point<PointType> pNW(gridMinX,gridMinY);
-    Point<PointType> pSE(gridMaxX,gridMaxY);
-    
+    int gridNumber = BoxNumber(p);
+    Point<PointType> pNW;
+    Point<PointType> pSE;
+    getBoundingBox(gridNumber,&pNW,&pSE);
+
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end(); ++pos)
     {
-      if(isWithinBox(pNW, pSE, (*pos).location))
+      if(~isWithinBox(pNW, pSE, (*pos).location))
       {
 	return false;
       }
@@ -230,7 +240,7 @@ struct GenericBoard
   {
     // point(3,1), grid:1
     // point(4,5), grid:5
-    // point(6,3), grid:
+    // point(6,3), grid:6
     int x = (p.x)/3;
     int y = (p.y)/3;
     return (y*3 + x + 1);
