@@ -157,7 +157,47 @@ public:
   /// <summary> Check if the move is valid by the Sudokill rules. </summary>
   bool IsValidMove(const Point& p, int value) const
   {
-    return (IsSudokuValidMove(p, value) && IsSameRowOrColumnIfPossible(p));
+    if(!IsSudokuValidMove(p, value))
+    {
+      return false;
+    }
+
+    if(playerMoveCount > 0)
+    {
+      const Point& lastPlay = positions.back().location;
+      if(lastPlay.x == p.x || lastPlay.y == p.y)
+      {
+        return true;
+      }
+
+      Point testPoint = lastPlay;
+
+      for(int x = 0; x < MaxX; x++)
+      {
+        testPoint.x = x;
+        if(!Occupied(testPoint))
+        {
+          return false;
+        }
+      }
+
+      testPoint = lastPlay;
+      for(int y = 0; y < MaxY; y++)
+      {
+        testPoint.y = y;
+        if(!Occupied(testPoint))
+        {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /// <summary> Check if the move is valid by the Sudokill rules. </summary>
+  bool IsValidMove(const Cell& cell) const
+  {
+    return IsValidMove(cell.location, cell.value);
   }
 
   /// <summary> Check if the move is valid by Sudoku rules. </summary>
@@ -172,72 +212,52 @@ public:
             IsValidBox(p, value));
   }
 
-  /// <summary> Check if the point is in the same row or column as the last move
-  ///   or else that it is not possible to do so based on the legal moves.
-  /// </summary>
-  bool IsSameRowOrColumnIfPossible(const Point& p) const
+  void ValidMoves(MoveList* moveBuffer) const
   {
-    if(positions.empty())
-    {
-      // Allow any move if this is the first move.
-      return true;
-    }
-    else
-    {
-      const Point& lastPlay = positions.back().location;
-      //std::cout << "Last Play: (" << lastPlay.x << "," << lastPlay.y << ")\n";
-      //std::cout << "This Play: (" << p.x << "," << p.y << ")\n";
-      if( (lastPlay.x == p.x) || (lastPlay.y == p.y))
-      {
-        return true;
-      }
-      else
-      {
-        MoveList sudokuMoves;
-        SudokuValidMoves(&sudokuMoves);
-        return !(SameRowColumnMovesAvailable(sudokuMoves));
-      }
-    }
-  }
-  bool IsSameRowOrColumnIfPossible(const Point& p, const MoveList& sudokuMoves) const
-  {
-    if(positions.empty())
-    {
-      // Allow any move if this is the first move.
-      return true;
-    }
-    else
-    {
-      const Point& lastPlay = positions.back().location;
-      //std::cout << "Last Play: (" << lastPlay.x << "," << lastPlay.y << ")\n";
-      //std::cout << "This Play: (" << p.x << "," << p.y << ")\n";
-      if( (lastPlay.x == p.x) || (lastPlay.y == p.y))
-      {
-        return true;
-      }
-      else
-      {
-        return !(SameRowColumnMovesAvailable(sudokuMoves));
-      }
-    }
-  }
+    assert(moveBuffer);
+    moveBuffer->clear();
 
-  bool SameRowColumnMovesAvailable(const MoveList& sudokuMoves) const
-  {
-    const Point& lastPlay = positions.back().location;
-    const int numMoves = static_cast<int>(sudokuMoves.size());
-    for(int i = 0; i < numMoves; ++i)
+    if(playerMoveCount > 0)
     {
-      const Point& validMoveLocation = sudokuMoves[i].location;
-      if(validMoveLocation.x == lastPlay.x || validMoveLocation.y == lastPlay.y)
+      const Point& lastPlay = positions.back().location;
+
+      Point testPoint = lastPlay;
+
+      for(int x = 0; x < MaxX; x++)
       {
-        // There is a valid move within the row or column which the last
-        // move was in.
-        return true;
+        testPoint.x = x;
+        if(!Occupied(testPoint))
+        {
+          for(int value = 1; value <= MaxValue; value++)
+          {
+            if(IsSudokuValidMove(testPoint, value))
+            {
+              moveBuffer->push_back(Cell(testPoint,value));
+            }
+          }
+        }
+      }
+
+      testPoint = lastPlay;
+      for(int y = 0; y < MaxY; y++)
+      {
+        testPoint.y = y;
+        if(!Occupied(testPoint))
+        {
+          for(int value = 1; value <= MaxValue; value++)
+          {
+            if(IsSudokuValidMove(testPoint, value))
+            {
+              moveBuffer->push_back(Cell(testPoint,value));
+            }
+          }
+        }
       }
     }
-    // There are no valid moves within the row or column.
-    return false;
+    if(moveBuffer->empty())
+    {
+      SudokuValidMoves(moveBuffer);
+    }
   }
 
   /// <summary> Verify that the value is in bounds. </summary>
@@ -391,40 +411,6 @@ public:
           }
         }
       }
-    }
-  }
-
-  /// <summary> Predicate used to filter Sudoku moves to
-  ///   Sudokill moves.
-  /// </summary>
-  struct IsNotSameRowOrColumn
-  {
-    IsNotSameRowOrColumn(const GenericBoard* board_, const MoveList& sudokuMoves_) :
-      board(board_),
-      sudokuMoves(&sudokuMoves_)
-    {}
-    inline bool operator()(const Cell& c) const
-    {
-      return !(board->IsSameRowOrColumnIfPossible(c.location, *sudokuMoves));
-    }
-    const GenericBoard* board;
-    const MoveList* sudokuMoves;
-  };
-
-  /// <summary> Filter valid Sudoku moves based upon Sudokill rules. <summary>
-  void ValidMoves(MoveList* moveBuffer) const
-  {
-    assert(moveBuffer);
-    assert(playerMoveCount >= 0);
-
-    SudokuValidMoves(moveBuffer);
-    if (playerMoveCount > 0)
-    {
-      MoveList sudokuMoves(*moveBuffer);
-      moveBuffer->erase(remove_if(moveBuffer->begin(), 
-                                  moveBuffer->end(),
-                                  IsNotSameRowOrColumn(this, sudokuMoves)),
-                        moveBuffer->end());
     }
   }
 

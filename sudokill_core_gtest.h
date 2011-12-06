@@ -39,14 +39,6 @@ TEST(GenericBoard, PlayMove)
   ASSERT_EQ(board.ValueAt(p), 1);
 }
 
-TEST(GenericBoard, IsSameRowOrColumnIfPossible)
-{
-  Board board;
-  board.PlayMove(Point(0,0),1);
-  EXPECT_FALSE(board.IsSameRowOrColumnIfPossible(Point(2,2)));
-  EXPECT_TRUE(board.IsSameRowOrColumnIfPossible(Point(0,8)));
-}
-
 TEST(GenericBoard, ValidMoves)
 {
   Board board;
