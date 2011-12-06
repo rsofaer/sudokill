@@ -181,11 +181,14 @@ int main(int argc, char *argv[])
       Cell move;
       player.NextMove(board, &move);
       std::stringstream ssMove;
-      ssMove << "MOVE START\n"
-             << move.location.x << " " << move.location.y << " " << move.value
-             << "MOVE END\n";
+      board.PrintBoard();
+      ssMove << move.location.x << " " << move.location.y << " " << move.value
+	     << "\n";
+	//<< "\nMOVE END\n";
+      std::cout << "ssMove.sr(): " << ssMove.str() <<std::endl; 
       Write(sockfd, ssMove.str());
       ++roundsPlayed;
+      
     } while (Read(sockfd, -1, &stateString) > 0);
     std::cout << "Played " << roundsPlayed << " rounds." << std::endl;
   }
