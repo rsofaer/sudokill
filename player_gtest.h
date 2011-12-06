@@ -21,6 +21,7 @@ TEST(AlphaBetaVsRandom, PlayerBattle)
     {
       Cell move;
       abPlayer.NextMove(board, &move);
+      std::cout << "ALPHABETA player moved: " << move.value << ", at: (" << move.location.x << "," << move.location.y << ")" << std::endl;
       if (!board.IsValidMove(move.location, move.value))
       {
         winner = "Random";
@@ -32,6 +33,7 @@ TEST(AlphaBetaVsRandom, PlayerBattle)
     {
       Cell move;
       randomPlayer.NextMove(board, &move);
+      std::cout << "RANDOM player moved: " << move.value << ", at: (" << move.location.x << "," << move.location.y << ")" << std::endl;
       if (!board.IsValidMove(move.location, move.value))
       {
         winner = "AlphaBeta";
