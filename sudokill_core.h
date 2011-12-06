@@ -265,7 +265,7 @@ struct GenericBoard
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end(); ++pos)
     {
-      if(!isWithinBox(pNW, pSE, (*pos).location))
+      if(!isWithinBox(pNW, pSE, pos->location) && pos->value == value )
       {
         return false;
       }
