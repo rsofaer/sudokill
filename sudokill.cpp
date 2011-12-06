@@ -4,6 +4,7 @@
 #ifdef WIN32
 #include <winsock.h>
 #else
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
