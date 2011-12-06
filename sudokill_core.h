@@ -9,55 +9,48 @@
 
 namespace hps 
 {
-
 namespace sudokill
 {
 
-template<typename PointType>
+/// <summary> A point is a 2d location. </summary>
 struct Point
 {
-  Point()
-  {}
-  Point(const PointType x_,
-        const PointType y_)
-  : x(x_),
-    y(y_)
-  {}
+  Point() : x(), y() {}
+  Point(const int x_, const int y_) : x(x_), y(y_) {}
   
-  PointType x;
-  PointType y;
+  int x;
+  int y;
   
-  Point operator+(const Point& rhs) const
+  inline const Point operator+(const Point& rhs) const
   {
     return Point(x+rhs.x, y+rhs.y);
   }
+
+  inline const Point operator-(const Point& rhs) const
+  {
+    return Point(x-rhs.x, y-rhs.y);
+  }
   
-  bool operator==(const Point& rhs) const
+  inline bool operator==(const Point& rhs) const
   {
     return (x == rhs.x && y == rhs.y);
   }
 };
 
-template <typename PointType>
+/// <summary> A cell is a board location that contains a value. </summary>
 struct Cell
 {
-  Cell(Point<PointType> location_,
-       int value_)
+  Cell(const Point& location_, int value_)
   : location(location_),
     value(value_)
   {}
 
-  // RJS 5/12:  I feel like I shouldn't be doing this.  We use it in ValueAt.
-  bool operator==(const Point<PointType>& rhs) const
-  {
-    return (location == rhs);
-  }
-
-  Point<PointType> location;
+  Point location;
   int value;
 };
   
-template<int MaxX_, int MaxY_, typename PointType>
+/// <summary> A board is a grid of cells. </summary>
+template<int MaxX_, int MaxY_>
 struct GenericBoard
 {
   // max x value.
@@ -65,105 +58,121 @@ struct GenericBoard
   // max y value.
   enum {MaxY = MaxY_,};
 
-  enum {Empty = -1,
-        MinValue = 1,
-        MaxValue = 9};
+  enum { Empty = -1, };
+  enum { MinValue = 1, };
+  enum { MaxValue = 9, };
 
-  typedef Point<PointType> point_type;
-  typedef Cell<PointType> move_type;
-  typedef std::vector<move_type> move_list_type;
+  typedef std::vector<Cell> MoveList;
   
-  std::vector<Cell<PointType> > positions;
+  /// <summary> List of occupied board cells. </summary>
+  MoveList positions;
+
+  /// <summary> Predicate to test that a move is at a given point. </summary>
+  struct MoveMatchesPoint
+  {
+    MoveMatchesPoint(const Point* p_) : p(p_) {}
+    inline bool operator()(const Cell& move) { return move.location == *p; }
+    const Point* p;
+  };
+
+  /// <summary> Test if the given board location is occupied. </summary>
+  inline bool Occupied(const Point& p) const
+  {
+    return positions.end() != std::find_if(positions.begin(),
+                                           positions.end(),
+                                           MoveMatchesPoint(&p));
+  }
   
-  /*
-   <summary> This function puts the value at a point</summary>
-   <parameters> A generic point Point and the value to be played.</parameters>
-   */
-  inline void PlayMove(Point<PointType> p, int value)
+  /// <summary> This function puts the value at a point</summary>
+  inline void PlayMove(const Point& p, int value)
   {
     assert(p.x >= 0 && p.x < MaxX);
     assert(p.y >= 0 && p.y < MaxY);
-    assert(isValidMove(p, value));
-    
-    typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(),positions.end(),p);
+    assert(IsValidMove(p, value));
     
     //assert if position occupied.
-    assert(pos == positions.end());
+    assert(!Occupied(p));
     
     //position is set by creating an object of type Cell.
-    Cell<PointType> c(p,value);
-    positions.push_back(c);
+    positions.push_back(Cell(p,value));
   }
   
-  /*
-   <summary> This function is used to Undo the last move.</summary>
-   */
+  /// <summary> This function is used to Undo the last move.</summary>
   inline void Undo()
   {
-    assert(positions.size() > 0);
+    assert(!positions.empty());
     // the last value played is put at the back.
     positions.pop_back();
   }
   
-  /*
-   <summary> This function returns the value at a point</summary>
-   <parameters> A generic point Point</parameters>
-   <returns> Value at point p or -1 if the location is empty.</returns>
-   */
-
-  const inline int ValueAt(const Point<PointType>& p)
+  /// <summary> This function returns the value at a point</summary>
+  /// <parameters> A generic point Point</parameters>
+  /// <returns> Value at point p or -1 if the location is empty.</returns>
+  inline int ValueAt(const Point& p) const
   {
     assert(p.x >= 0 && p.x < MaxX);
     assert(p.y >= 0 && p.y < MaxY);
-    int retVal = Empty;
     
-    typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(),positions.end(),p);
-    
-    if(pos != positions.end())
+    typedef typename MoveList::const_iterator ConstPosition;
+    const ConstPosition positionsEnd = positions.end();
+    ConstPosition pos = std::find_if(positions.begin(),
+                                     positionsEnd,
+                                     MoveMatchesPoint(&p));
+    if(pos != positionsEnd)
     {
-      retVal = (*pos).value;
+      return (*pos).value;
     }
-      
-    return retVal;
+    else
+    {
+      return Empty;
+    }
   }
   
-  const bool isValidMove(const Point<PointType>& p, int value)
+  /// <summary> Check if the move is valid by the Sudokill rules. </summary>
+  bool IsValidMove(const Point& p, int value) const
   {
-    return (isSudokuValidMove(p, value) && 
-            isSameRowOrColumnIfPossible(p));
+    return (IsSudokuValidMove(p, value) && IsSameRowOrColumnIfPossible(p));
   }
 
-  const bool isSudokuValidMove(const Point<PointType>& p, int value)
+  /// <summary> Check if the move is valid by Sudoku rules. </summary>
+  bool IsSudokuValidMove(const Point& p, int value) const
   {
     return ((p.x >=0 && p.x < MaxX) &&
             (p.y >= 0 && p.y < MaxY) &&
-            isEmpty(p) &&
-            isValidValue(value) &&
-	          isValidRow(p, value) &&
-	          isValidColumn(p, value) &&
-	          isValidBox(p, value));
+            !Occupied(p) &&
+            IsValidValue(value) &&
+            IsValidRow(p, value) &&
+            IsValidColumn(p, value) &&
+            IsValidBox(p, value));
   }
 
-  const bool isSameRowOrColumnIfPossible(const Point<PointType>& p)
+  /// <summary> Check if the point is in the same row or column as the last move
+  ///   or else that it is not possible to do so based on the legal moves.
+  /// </summary>
+  bool IsSameRowOrColumnIfPossible(const Point& p) const
   {
-    if(positions.size() == 0)
+    if(positions.empty())
     {
       // Allow any move if this is the first move.
       return true;
-    } else
+    }
+    else
     {
-      Point<PointType> lastPlay = positions.back().location;
+      const Point& lastPlay = positions.back().location;
       //std::cout << "Last Play: (" << lastPlay.x << "," << lastPlay.y << ")\n";
       //std::cout << "This Play: (" << p.x << "," << p.y << ")\n";
-      if( (lastPlay.x == p.x) || (lastPlay.y == p.y)){
-        return true;
-      } else
+      if( (lastPlay.x == p.x) || (lastPlay.y == p.y))
       {
-        move_list_type validMoves;
+        return true;
+      }
+      else
+      {
+        MoveList validMoves;
         SudokuValidMoves(&validMoves);
-        for(unsigned int i = 0; i < validMoves.size(); i++)
+        const int numMoves = static_cast<int>(validMoves.size());
+        for(int i = 0; i < numMoves; ++i)
         {
-          point_type p = validMoves[i].location;
+          const Point& p = validMoves[i].location;
           if(p.x == lastPlay.x || p.y == lastPlay.y)
           {
             // There is a valid move within the row or column which the last
@@ -177,62 +186,62 @@ struct GenericBoard
     }
   }
 
-  const bool isValidValue(int value)
+  /// <summary> Verify that the value is in bounds. </summary>
+  bool IsValidValue(int value) const
   {
     return value >= MinValue && value <= MaxValue;
   }
 
-  const bool isValidRow(const Point<PointType>& p, int value)
+  /// <summary> Verify that the row conforms to Sudoku rules. </sumary>
+  bool IsValidRow(const Point& p, int value) const
   {
-    typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
-    for(; pos != positions.end();++pos)
+    typename MoveList::const_iterator pos = positions.begin();
+    typename const MoveList::const_iterator positionsEnd = positions.end();
+    for(; pos != positionsEnd; ++pos)
     {
       if((*pos).location.y == p.y && (*pos).value == value)
       {
-	//std::cout << "isValidRow returned false" << std::endl;
+        //std::cout << "isValidRow returned false" << std::endl;
         return false;
       }
     }
-    //    std::cout << "isValidRow returned true" <<std::endl;
+    //std::cout << "isValidRow returned true" <<std::endl;
     return true;
   }
   
-  const bool isValidColumn(const Point<PointType>& p, int value)
+  /// <summary> Verify that the column conforms to Sudoku rules. </sumary>
+  bool IsValidColumn(const Point& p, int value) const
   {
-    typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
-    for(; pos != positions.end();++pos)
+    typename MoveList::const_iterator pos = positions.begin();
+    typename const MoveList::const_iterator positionsEnd = positions.end();
+    for(; pos != positionsEnd; ++pos)
     {
       if((*pos).location.x == p.x && (*pos).value == value)
       {
-	//std::cout << "isValidColumn returned false" <<std::endl;
+        //std::cout << "isValidColumn returned false" <<std::endl;
         return false;
       }
     }
-    //    std::cout << "isValidColumn returned true" <<std::endl;
+    //std::cout << "isValidColumn returned true" <<std::endl;
     return true;
   }
 
-  const bool isEmpty(const Point<PointType>& p)
-  {
-    typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(), positions.end(), p);
-    if(pos != positions.end())
-    {
-      return false;
-    }
-    return true;
-  }
-
-  const bool isWithinBox(const Point<PointType>& NW, const Point<PointType>& SE, const Point<PointType>& p)
+  /// <summary> Verify that the point is within the bounding box. </summary>
+  inline static bool IsWithinBox(const Point& NW, const Point& SE, const Point& p)
   {
     return (p.x >= NW.x) && (p.x >= NW.y) && (p.x <= SE.x) && (p.y <= SE.y); 
   }
 
-  const void getBoundingBox(int boxNumber, 
-		      Point<PointType>* pNW,
-		      Point<PointType>* pSE)
+#pragma warning(push)
+#pragma warning(disable: 4701) // Uninitialized local variable.
+  void GetBoundingBox(int boxNumber, Point* pNW, Point* pSE) const
   {
-    int boxMinX, boxMaxX;
-    int boxMinY, boxMaxY;
+    assert(pNW && pSE);
+
+    int& boxMinX = pNW->x;
+    int& boxMaxX = pSE->x;
+    int& boxMinY = pNW->y;
+    int& boxMaxY = pSE->y;
     
     switch(boxNumber)
     {
@@ -263,38 +272,42 @@ struct GenericBoard
     case 9:
       boxMinX = 6; boxMaxX = 8; boxMinY = 6; boxMaxY = 8; 
       break;
+    default:
+      assert(false && "Should not reach here.");
     }
-    pNW->x = boxMinX; pNW->y = boxMinY;
-    pSE->x = boxMaxX; pSE->y = boxMaxY;
-    //std::cout << "boxminx: " << boxMinX << std::endl;
-    //std::cout << "boxminy: " << boxMinY << std::endl;
-    //std::cout << "boxmaxx: " << boxMaxX << std::endl;
-    //std::cout << "boxmaxy: " << boxMaxY << std::endl;
+    //std::cout << "boxminx: " << pNW->x << std::endl;
+    //std::cout << "boxminy: " << pNW->y << std::endl;
+    //std::cout << "boxmaxx: " << pSE->x << std::endl;
+    //std::cout << "boxmaxy: " << pSE->y << std::endl;
   }
-  const bool isValidBox(const Point<PointType>& p, int value)
+#pragma warning(pop)
+
+  /// <summary> Verify 3x3 box containing p is valid by Sudoku rules. </summary>
+  bool IsValidBox(const Point& p, int value) const
   {
     assert(p.x >=0 && p.x < MaxX);
     assert(p.y >=0 && p.y < MaxY);
     //std::cout << "value: " << value <<std::endl;
-    int boxNumber = BoxNumber(p);
+    const int boxNumber = BoxNumber(p);
     //std::cout << "box Number: " << boxNumber <<std::endl;
-    Point<PointType> pNW;
-    Point<PointType> pSE;
-    getBoundingBox(boxNumber,&pNW,&pSE);
+    Point pNW;
+    Point pSE;
+    GetBoundingBox(boxNumber,&pNW,&pSE);
 
-    typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
-    for(; pos != positions.end(); ++pos)
+    typename MoveList::const_iterator pos = positions.begin();
+    typename const MoveList::const_iterator positionsEnd = positions.end();
+    for(; pos != positionsEnd; ++pos)
     {
-      if(isWithinBox(pNW, pSE, pos->location) && pos->value == value )
+      if(IsWithinBox(pNW, pSE, pos->location) && pos->value == value )
       {
         return false;
       }
     }
     return true;
-    
   }
 
-  const int BoxNumber(const Point<PointType>& p)
+  /// <summary> Get Sudoku 3x3 box index. </summary>
+  int BoxNumber(const Point& p) const
   {
     // point(3,1), grid:1
     // point(4,5), grid:5
@@ -304,8 +317,12 @@ struct GenericBoard
     return (y*3 + x + 1);
   }
 
-  const void SudokuValidMoves(move_list_type* moveBuffer)
+  /// <summary> Get the list of valid Sudoku moves from the
+  ///   current state.
+  /// </summary>
+  void SudokuValidMoves(MoveList* moveBuffer) const
   {
+    assert(moveBuffer);
     // This is the dumbest code I've ever written.
     // Memoizing it would bring a pretty big performance benefit
     // Cachebust on PlayMove and Undo
@@ -314,47 +331,46 @@ struct GenericBoard
     {
       for(int j = 0; j < MaxY; j++)
       {
-        Point<PointType> p(i,j);
+        Point p(i,j);
         for(int v = MinValue; v <= MaxValue; v++)
         {
-          if(isSudokuValidMove(p, v))
+          if(IsSudokuValidMove(p, v))
           {
-            Cell<PointType> c(p,v);
-            moveBuffer->push_back(c);
+            moveBuffer->push_back(Cell(p,v));
           }
         }
       }
     }
   }
 
+  /// <summary> Predicate used to filter Sudoku moves to
+  ///   Sudokill moves.
+  /// </summary>
   struct IsNotSameRowOrColumn
   {
-    IsNotSameRowOrColumn(GenericBoard<MaxX_, MaxY_, PointType>* board_)
-    : board(board_)
-    {}
-
-    const bool operator()(const Cell<PointType>& c)
+    IsNotSameRowOrColumn(const GenericBoard* board_) : board(board_) {}
+    inline bool operator()(const Cell& c) const
     {
-      return !(board->isSameRowOrColumnIfPossible(c.location));
+      return !(board->IsSameRowOrColumnIfPossible(c.location));
     }
-
-    GenericBoard<MaxX_, MaxY_, PointType>* board;
+    const GenericBoard* board;
   };
 
-  const void ValidMoves(move_list_type* moveBuffer)
+  /// <summary> Filter valid Sudoku moves based upon Sudokill rules. <summary>
+  void ValidMoves(MoveList* moveBuffer) const
   {
+    assert(moveBuffer);
     SudokuValidMoves(moveBuffer);
-    IsNotSameRowOrColumn f(this);
     moveBuffer->erase(remove_if(moveBuffer->begin(), 
                                 moveBuffer->end(),
-                                f),
+                                IsNotSameRowOrColumn(this)),
                       moveBuffer->end());
   }
-
 };
 
-}
-}
+} // end ns sudokill
+using namespace sudokill;
+} // end ns hps
 
 
 #endif // _SUDOKILL_SUDOKILL_CORE_H

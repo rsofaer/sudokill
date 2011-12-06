@@ -9,8 +9,7 @@ namespace _hps_sudokill_core_gtest_h
 {
 using namespace hps;
 
-typedef sudokill::GenericBoard<9, 9, int> Board;
-typedef sudokill::Point<int> Point;
+typedef sudokill::GenericBoard<9, 9> Board;
 
 TEST(GenericBoard, initialization)
 {
@@ -24,7 +23,7 @@ TEST(GenericBoard, initialization)
     for(int j = 0; j < Board::MaxY; j++)
     {
       Point point(i, j);
-      ASSERT_EQ(board.ValueAt(point), Board::Empty);
+      ASSERT_EQ(board.ValueAt(point), static_cast<int>(Board::Empty));
     }
   }
 }
@@ -33,27 +32,27 @@ TEST(GenericBoard, PlayMove)
 {
   Board board;
   Point p(0,0);
-  ASSERT_EQ(board.ValueAt(p), Board::Empty);
+  ASSERT_EQ(board.ValueAt(p), static_cast<int>(Board::Empty));
   board.PlayMove(p, 1);
   ASSERT_EQ(board.ValueAt(p), 1);
 }
 
-TEST(GenericBoard, isSameRowOrColumnIfPossible)
+TEST(GenericBoard, IsSameRowOrColumnIfPossible)
 {
   Board board;
   board.PlayMove(Point(0,0),1);
-  EXPECT_FALSE(board.isSameRowOrColumnIfPossible(Point(2,2)));
-  EXPECT_TRUE(board.isSameRowOrColumnIfPossible(Point(0,8)));
+  EXPECT_FALSE(board.IsSameRowOrColumnIfPossible(Point(2,2)));
+  EXPECT_TRUE(board.IsSameRowOrColumnIfPossible(Point(0,8)));
 }
 
 TEST(GenericBoard, ValidMoves)
 {
   Board board;
-  Board::move_list_type moves;
+  Board::MoveList moves;
 
   int maxMoves =  Board::MaxX * Board::MaxY * (Board::MaxValue - Board::MinValue + 1);
   
-  ASSERT_TRUE(board.isSudokuValidMove(Point(0,0),1));
+  ASSERT_TRUE(board.IsSudokuValidMove(Point(0,0),1));
   board.SudokuValidMoves(&moves);
   EXPECT_EQ(maxMoves, moves.size());
 
@@ -63,23 +62,23 @@ TEST(GenericBoard, ValidMoves)
   EXPECT_EQ(maxMoves, moves.size());
 }
 
-TEST(GenericBoard, isValidBox)
+TEST(GenericBoard, IsValidBox)
 {
   Board board;
-  EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
-  EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
-  EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
-  EXPECT_TRUE(board.isValidBox(Point(2,2), 1));
+  EXPECT_TRUE(board.IsValidBox(Point(1,0), 2));
+  EXPECT_TRUE(board.IsValidBox(Point(0,8), 2));
+  EXPECT_TRUE(board.IsValidBox(Point(5,5), 6));
+  EXPECT_TRUE(board.IsValidBox(Point(2,2), 1));
   board.PlayMove(Point(0,0), 1);
-  EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
-  EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
-  EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
-  EXPECT_FALSE(board.isValidBox(Point(2,2), 1));
+  EXPECT_TRUE(board.IsValidBox(Point(1,0), 2));
+  EXPECT_TRUE(board.IsValidBox(Point(0,8), 2));
+  EXPECT_TRUE(board.IsValidBox(Point(5,5), 6));
+  EXPECT_FALSE(board.IsValidBox(Point(2,2), 1));
   board.PlayMove(Point(0,3), 9);
   board.PlayMove(Point(4,3), 4);
-  EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
-  EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
-  EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
+  EXPECT_TRUE(board.IsValidBox(Point(1,0), 2));
+  EXPECT_TRUE(board.IsValidBox(Point(0,8), 2));
+  EXPECT_TRUE(board.IsValidBox(Point(5,5), 6));
 
 
 }
@@ -128,12 +127,12 @@ TEST(GenericBoard, BoxNumber)
   EXPECT_EQ(board.BoxNumber(Point(7,6)),9); 
 }
 
-TEST(GenericBoard, getBoundingBox)
+TEST(GenericBoard, GetBoundingBox)
 {
   Board board;
   Point pNW(-1,-1);
   Point pSE(9,9);
-  board.getBoundingBox(board.BoxNumber(Point(4,3)),&pNW,&pSE);
+  board.GetBoundingBox(board.BoxNumber(Point(4,3)),&pNW,&pSE);
   EXPECT_EQ(pNW.x,3);
   EXPECT_EQ(pNW.y,3);
   EXPECT_EQ(pSE.x,5);
@@ -141,36 +140,36 @@ TEST(GenericBoard, getBoundingBox)
   
 }
 
-TEST(GenericBoard, isValidMove)
+TEST(GenericBoard, IsValidMove)
 {
   Board board;
   // Invalid Points:
-  EXPECT_FALSE(board.isValidMove(Point(-1, -1), 1));
-  EXPECT_FALSE(board.isValidMove(Point(10,10), 3));
-  EXPECT_FALSE(board.isValidMove(Point(Board::MaxX,Board::MaxY), 9));
+  EXPECT_FALSE(board.IsValidMove(Point(-1, -1), 1));
+  EXPECT_FALSE(board.IsValidMove(Point(10,10), 3));
+  EXPECT_FALSE(board.IsValidMove(Point(Board::MaxX,Board::MaxY), 9));
   // Invalid Values:
-  EXPECT_FALSE(board.isValidMove(Point(3, 3), 0));
-  EXPECT_FALSE(board.isValidMove(Point(3, 3), -1));
-  EXPECT_FALSE(board.isValidMove(Point(3, 3), 10));
+  EXPECT_FALSE(board.IsValidMove(Point(3, 3), 0));
+  EXPECT_FALSE(board.IsValidMove(Point(3, 3), -1));
+  EXPECT_FALSE(board.IsValidMove(Point(3, 3), 10));
   // Valid Moves:
-  EXPECT_TRUE(board.isValidMove(Point(0,0), 1));
-  EXPECT_TRUE(board.isValidMove(Point(0,0), 9));
-  EXPECT_TRUE(board.isValidMove(Point(Board::MaxX-1,Board::MaxY-1), 9));
+  EXPECT_TRUE(board.IsValidMove(Point(0,0), 1));
+  EXPECT_TRUE(board.IsValidMove(Point(0,0), 9));
+  EXPECT_TRUE(board.IsValidMove(Point(Board::MaxX-1,Board::MaxY-1), 9));
   
   board.PlayMove(Point(0,0), 1);
 
   // Sudoku invalid move:
-  EXPECT_FALSE(board.isValidMove(Point(0,0),2));
-  EXPECT_FALSE(board.isValidMove(Point(6,0),1));
-  EXPECT_FALSE(board.isValidMove(Point(0,6),1));
-  EXPECT_FALSE(board.isValidMove(Point(2,2),1));
+  EXPECT_FALSE(board.IsValidMove(Point(0,0),2));
+  EXPECT_FALSE(board.IsValidMove(Point(6,0),1));
+  EXPECT_FALSE(board.IsValidMove(Point(0,6),1));
+  EXPECT_FALSE(board.IsValidMove(Point(2,2),1));
   // Sudokill invalid move:
-  EXPECT_FALSE(board.isValidMove(Point(4,4),2)); // Same row or column required.
-  EXPECT_FALSE(board.isValidMove(Point(2,2),2)); // Same box doesn't count.
+  EXPECT_FALSE(board.IsValidMove(Point(4,4),2)); // Same row or column required.
+  EXPECT_FALSE(board.IsValidMove(Point(2,2),2)); // Same box doesn't count.
   
-  EXPECT_TRUE(board.isValidMove(Point(1,0), 2));
-  EXPECT_TRUE(board.isValidMove(Point(0,1), 2));
-  EXPECT_TRUE(board.isValidMove(Point(0,8), 2));
+  EXPECT_TRUE(board.IsValidMove(Point(1,0), 2));
+  EXPECT_TRUE(board.IsValidMove(Point(0,1), 2));
+  EXPECT_TRUE(board.IsValidMove(Point(0,8), 2));
   
   // Now play out all the moves in the relevant row and column:
   board.PlayMove(Point(0,1), 2);
@@ -192,7 +191,7 @@ TEST(GenericBoard, isValidMove)
   board.PlayMove(Point(1,8), 8);
 
   board.PlayMove(Point(0,8),9); // No moves left in column 0 and row 8.
-  EXPECT_TRUE(board.isValidMove(Point(2,2),9));
+  EXPECT_TRUE(board.IsValidMove(Point(2,2),9));
 }
 }
 
