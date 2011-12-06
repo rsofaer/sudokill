@@ -192,7 +192,7 @@ TEST(GenericBoard, isValidMove)
   board.PlayMove(Point(1,8), 8);
 
   board.PlayMove(Point(0,8),9); // No moves left in column 0 and row 8.
-  EXPECT_TRUE(board.isValidMove(Point(2,2),2));
+  EXPECT_TRUE(board.isValidMove(Point(2,2),9));
 }
 }
 
