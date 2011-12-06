@@ -45,58 +45,22 @@ TEST(GenericBoard, isSameRowOrColumnIfPossible)
   EXPECT_FALSE(board.isSameRowOrColumnIfPossible(Point(2,2)));
   EXPECT_TRUE(board.isSameRowOrColumnIfPossible(Point(0,8)));
 }
-TEST(GenericBoard, isValidMove)
+
+TEST(GenericBoard, ValidMoves)
 {
   Board board;
-  // Invalid Points:
-  EXPECT_FALSE(board.isValidMove(Point(-1, -1), 1));
-  EXPECT_FALSE(board.isValidMove(Point(10,10), 3));
-  EXPECT_FALSE(board.isValidMove(Point(Board::MaxX,Board::MaxY), 9));
-  // Invalid Values:
-  EXPECT_FALSE(board.isValidMove(Point(3, 3), 0));
-  EXPECT_FALSE(board.isValidMove(Point(3, 3), -1));
-  EXPECT_FALSE(board.isValidMove(Point(3, 3), 10));
-  // Valid Moves:
-  EXPECT_TRUE(board.isValidMove(Point(0,0), 1));
-  EXPECT_TRUE(board.isValidMove(Point(0,0), 9));
-  EXPECT_TRUE(board.isValidMove(Point(Board::MaxX-1,Board::MaxY-1), 9));
-  
-  board.PlayMove(Point(0,0), 1);
+  Board::move_list_type moves;
 
-  // Sudoku invalid move:
-  EXPECT_FALSE(board.isValidMove(Point(0,0),2));
-  EXPECT_FALSE(board.isValidMove(Point(6,0),1));
-  EXPECT_FALSE(board.isValidMove(Point(0,6),1));
-  EXPECT_FALSE(board.isValidMove(Point(2,2),1));
-  // Sudokill invalid move:
-  EXPECT_FALSE(board.isValidMove(Point(4,4),2)); // Same row or column required.
-  EXPECT_FALSE(board.isValidMove(Point(2,2),2)); // Same box doesn't count.
+  int maxMoves =  Board::MaxX * Board::MaxY * (Board::MaxValue - Board::MinValue + 1);
   
-  EXPECT_TRUE(board.isValidMove(Point(1,0), 2));
-  EXPECT_TRUE(board.isValidMove(Point(0,1), 2));
-  EXPECT_TRUE(board.isValidMove(Point(0,8), 2));
-  
-  // Now play out all the moves in the relevant row and column:
-  board.PlayMove(Point(0,1), 2);
-  board.PlayMove(Point(0,2), 3);
-  board.PlayMove(Point(0,3), 4);
-  board.PlayMove(Point(0,4), 5);
-  board.PlayMove(Point(0,5), 6);
-  board.PlayMove(Point(0,6), 7);
-  board.PlayMove(Point(0,7), 8);
-  // The Column is full, play across the board to get to the row:
-  board.PlayMove(Point(8,7), 9);
-  board.PlayMove(Point(8,8), 1);
-  board.PlayMove(Point(7,8), 2);
-  board.PlayMove(Point(6,8), 3);
-  board.PlayMove(Point(5,8), 4);
-  board.PlayMove(Point(4,8), 5);
-  board.PlayMove(Point(3,8), 6);
-  board.PlayMove(Point(2,8), 7);
-  board.PlayMove(Point(1,8), 8);
+  ASSERT_TRUE(board.isSudokuValidMove(Point(0,0),1));
+  board.SudokuValidMoves(&moves);
+  EXPECT_EQ(maxMoves, moves.size());
 
-  board.PlayMove(Point(1,8),9); // No moves left in column 0 and row 8.
-  EXPECT_TRUE(board.isValidMove(Point(2,2),2));
+  moves.clear();
+  
+  board.ValidMoves(&moves);
+  EXPECT_EQ(maxMoves, moves.size());
 }
 
 TEST(GenericBoard, isValidBox)
@@ -111,7 +75,7 @@ TEST(GenericBoard, isValidBox)
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
   EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
   EXPECT_FALSE(board.isValidBox(Point(2,2), 1));
-  //board.PlayMove(Point(0,3), 9);
+  board.PlayMove(Point(0,3), 9);
   board.PlayMove(Point(4,3), 4);
   EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
@@ -177,14 +141,59 @@ TEST(GenericBoard, getBoundingBox)
   
 }
 
-TEST(GenericBoard, ValidMoves)
+TEST(GenericBoard, isValidMove)
 {
   Board board;
-  Board::move_list_type moves;
-  board.ValidMoves(&moves);
-  EXPECT_EQ(moves.size(), Board::MaxX * Board::MaxY * (Board::MaxValue - Board::MinValue));
-}
+  // Invalid Points:
+  EXPECT_FALSE(board.isValidMove(Point(-1, -1), 1));
+  EXPECT_FALSE(board.isValidMove(Point(10,10), 3));
+  EXPECT_FALSE(board.isValidMove(Point(Board::MaxX,Board::MaxY), 9));
+  // Invalid Values:
+  EXPECT_FALSE(board.isValidMove(Point(3, 3), 0));
+  EXPECT_FALSE(board.isValidMove(Point(3, 3), -1));
+  EXPECT_FALSE(board.isValidMove(Point(3, 3), 10));
+  // Valid Moves:
+  EXPECT_TRUE(board.isValidMove(Point(0,0), 1));
+  EXPECT_TRUE(board.isValidMove(Point(0,0), 9));
+  EXPECT_TRUE(board.isValidMove(Point(Board::MaxX-1,Board::MaxY-1), 9));
+  
+  board.PlayMove(Point(0,0), 1);
 
+  // Sudoku invalid move:
+  EXPECT_FALSE(board.isValidMove(Point(0,0),2));
+  EXPECT_FALSE(board.isValidMove(Point(6,0),1));
+  EXPECT_FALSE(board.isValidMove(Point(0,6),1));
+  EXPECT_FALSE(board.isValidMove(Point(2,2),1));
+  // Sudokill invalid move:
+  EXPECT_FALSE(board.isValidMove(Point(4,4),2)); // Same row or column required.
+  EXPECT_FALSE(board.isValidMove(Point(2,2),2)); // Same box doesn't count.
+  
+  EXPECT_TRUE(board.isValidMove(Point(1,0), 2));
+  EXPECT_TRUE(board.isValidMove(Point(0,1), 2));
+  EXPECT_TRUE(board.isValidMove(Point(0,8), 2));
+  
+  // Now play out all the moves in the relevant row and column:
+  board.PlayMove(Point(0,1), 2);
+  board.PlayMove(Point(0,2), 3);
+  board.PlayMove(Point(0,3), 4);
+  board.PlayMove(Point(0,4), 5);
+  board.PlayMove(Point(0,5), 6);
+  board.PlayMove(Point(0,6), 7);
+  board.PlayMove(Point(0,7), 8);
+  // The Column is full, play across the board to get to the row:
+  board.PlayMove(Point(8,7), 9);
+  board.PlayMove(Point(8,8), 1);
+  board.PlayMove(Point(7,8), 2);
+  board.PlayMove(Point(6,8), 3);
+  board.PlayMove(Point(5,8), 4);
+  board.PlayMove(Point(4,8), 5);
+  board.PlayMove(Point(3,8), 6);
+  board.PlayMove(Point(2,8), 7);
+  board.PlayMove(Point(1,8), 8);
+
+  board.PlayMove(Point(0,8),9); // No moves left in column 0 and row 8.
+  EXPECT_TRUE(board.isValidMove(Point(2,2),9));
+}
 }
 
 #endif //_HPS_SUDOKILL_CORE_GTEST_H_
