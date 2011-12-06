@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
     Board board;
     int roundsPlayed = 0;
     Parser::Parse(stateString, &board);
-    RandomPlayer player;
+    AlphaBetaPlayer player;
     // Play until the server disconnects.
     do
     {
