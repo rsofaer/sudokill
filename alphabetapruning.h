@@ -19,7 +19,7 @@ struct AlphaBetaPruning
         maxDepth(-1),
         bestMinimax(0),
         bestPlyIdx(-1),
-        dfsPlys(Board::NumRemoved + (2 * Player::NumWeights) - 2),
+        dfsPlys(),
         victoryIsMine(NULL)
     {}
 
@@ -211,8 +211,8 @@ private:
 
   template <typename MinimaxFunc, typename BoardEvaulationFunction>
   static void ABPruningChildrenHelper(ThreadParams* params,
-                                      std::vector<Ply>::const_iterator testPly,
-                                      std::vector<Ply>::const_iterator endPly,
+                                      Board::MoveList::const_iterator testPly,
+                                      Board::MoveList::const_iterator endPly,
                                       const BoardEvaulationFunction* evalFunc,
                                       const int* alpha,
                                       const int* beta,

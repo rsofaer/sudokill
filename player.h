@@ -15,7 +15,9 @@ class AlphaBetaPlayer
   {
     inline int operator()(const Board& board) const
     {
-      -board.SudokuValidMoves();
+      Board::MoveList moves;
+      board.SudokuValidMoves(&moves);
+      return -static_cast<int>(moves.size());
     }
   };
 public:
@@ -24,9 +26,8 @@ public:
   /// <summary> Return the next move for the player. </summary>
   void NextMove(const Board& board, Cell* move)
   {
-    AlphaBetaPruning::Run(&params, &board,
-                          ShrinkPossibleMovesEvaluationFunc(),
-                          &move);
+    ShrinkPossibleMovesEvaluationFunc f;
+    AlphaBetaPruning::Run(&params, &const_cast<Board&>(board), &f, move);
   }
 
 private:
