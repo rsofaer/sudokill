@@ -2,6 +2,7 @@
 #define _ALPHABETAPRUNING_H_
 #include "sudokill_core.h"
 #include <omp.h>
+#include <limits>
 
 namespace hps
 {

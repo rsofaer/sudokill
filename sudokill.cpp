@@ -1,8 +1,10 @@
 #include "sudokill_core.h"
 #include "board_parser.h"
+#include "player.h"
 #ifdef WIN32
 #include <winsock.h>
 #else
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -171,16 +173,17 @@ int main(int argc, char *argv[])
     Board board;
     int roundsPlayed = 0;
     Parser::Parse(stateString, &board);
-    //GreedyPlayer player(game, 30);
+    RandomPlayer player;
     // Play until the server disconnects.
     do
     {
       Parser::Parse(stateString, &board);
-      //player.Play(game);
+      Cell move;
+      player.NextMove(board, &move);
       std::stringstream ssMove;
-      const Cell& cell = board.LastMove();
-      ssMove << cell.location.x << " " << cell.location.y << " "
-             << cell.value << "\n";
+      ssMove << "MOVE START\n"
+             << move.location.x << " " << move.location.y << " " << move.value
+             << "MOVE END\n";
       Write(sockfd, ssMove.str());
       ++roundsPlayed;
     } while (Read(sockfd, -1, &stateString) > 0);
