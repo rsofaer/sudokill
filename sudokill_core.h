@@ -6,6 +6,7 @@
 #include <functional>
 #include <assert.h>
 #include <iostream>
+#include "rand_bound.h"
 
 namespace hps 
 {
@@ -371,9 +372,34 @@ struct GenericBoard
                                 IsNotSameRowOrColumn(this)),
                       moveBuffer->end());
   }
+
+  void RandomEmptyCell(Cell* c)
+  {
+    Point p(0,0);
+    for(int x = 0; x < MaxX; x++)
+    {
+      for(int y = 0; y < MaxY; y++)
+      {
+        p.x = x;
+        p.y = y;
+        if(!Occupied(p))
+        {
+          c->location = p;
+          c->value = math::RandBound(MaxValue + 1);
+          return;
+        }
+      }
+    }
+  }
 };
 
 typedef sudokill::GenericBoard<9, 9> Board;
+
+inline void AnyPlyWillDo(Board* board, Cell* cell)
+{
+  board->RandomEmptyCell(cell);
+}
+
 } // end ns sudokill
 using namespace sudokill;
 } // end ns hps
