@@ -6,6 +6,7 @@
 #include <functional>
 #include <assert.h>
 #include <iostream>
+#include "rand_bound.h"
 
 namespace hps 
 {
@@ -40,6 +41,7 @@ struct Point
 /// <summary> A cell is a board location that contains a value. </summary>
 struct Cell
 {
+  Cell() : location(), value() {}
   Cell(const Point& location_, int value_)
   : location(location_),
     value(value_)
@@ -368,9 +370,35 @@ struct GenericBoard
                                 IsNotSameRowOrColumn(this)),
                       moveBuffer->end());
   }
+
+  /// <summary> Find any unoccupied cell and make a move for it. </summary>
+  void RandomEmptyCell(Cell* c) const
+  {
+    Point p(0,0);
+    for(int x = 0; x < MaxX; x++)
+    {
+      for(int y = 0; y < MaxY; y++)
+      {
+        p.x = x;
+        p.y = y;
+        if(!Occupied(p))
+        {
+          c->location = p;
+          c->value = math::RandBound(MaxValue + 1);
+          return;
+        }
+      }
+    }
+  }
 };
 
 typedef sudokill::GenericBoard<9, 9> Board;
+
+inline void AnyPlyWillDo(const Board* board, Cell* cell)
+{
+  board->RandomEmptyCell(cell);
+}
+
 } // end ns sudokill
 using namespace sudokill;
 } // end ns hps

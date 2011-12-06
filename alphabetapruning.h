@@ -19,7 +19,7 @@ struct AlphaBetaPruning
         maxDepth(-1),
         bestMinimax(0),
         bestPlyIdx(-1),
-        dfsPlys(Board::NumRemoved + (2 * Player::NumWeights) - 2),
+        dfsPlys(),
         victoryIsMine(NULL)
     {}
 
@@ -111,11 +111,11 @@ struct AlphaBetaPruning
         {
           // Apply the ply for this state.
           Cell& mkChildPly = plys[plyIdx];
-          threadParams.state->PlayMove(mkChildPly);
+          threadParams.state.PlayMove(mkChildPly);
           // Run on the subtree.
           const int minimax = RunThread(alpha, beta, &threadParams, evalFunc);
           // Undo the ply for the next worker.
-          threadParams.state->Undo();
+          threadParams.state.Undo();
           // Collect best minimax for this thread.
           if ((-1 == threadParams.bestPlyIdx) ||
               (minimax > threadParams.bestMinimax))
@@ -211,8 +211,8 @@ private:
 
   template <typename MinimaxFunc, typename BoardEvaulationFunction>
   static void ABPruningChildrenHelper(ThreadParams* params,
-                                      std::vector<Ply>::const_iterator testPly,
-                                      std::vector<Ply>::const_iterator endPly,
+                                      Board::MoveList::const_iterator testPly,
+                                      Board::MoveList::const_iterator endPly,
                                       const BoardEvaulationFunction* evalFunc,
                                       const int* alpha,
                                       const int* beta,
