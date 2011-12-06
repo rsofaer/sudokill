@@ -129,14 +129,19 @@ struct GenericBoard
   
   bool isValidMove(const Point<PointType>& p, int value)
   {
+    return (isSudokuValidMove(p, value) && 
+            isSameRowOrColumnIfPossible(p));
+  }
+
+  bool isSudokuValidMove(const Point<PointType>& p, int value)
+  {
     return ((p.x >=0 && p.x < MaxX) &&
             (p.y >= 0 && p.y < MaxY) &&
             isEmpty(p) &&
             isValidValue(value) &&
 	          isValidRow(p, value) &&
 	          isValidColumn(p, value) &&
-	          isValidBox(p, value)); //&&
-            //isSameRowOrColumnIfPossible(p);
+	          isValidBox(p, value));
   }
 
   bool isSameRowOrColumnIfPossible(const Point<PointType>& p)
@@ -155,7 +160,7 @@ struct GenericBoard
       } else
       {
         move_list_type validMoves;
-        ValidMoves(validMoves);
+        ValidMoves(&validMoves);
         for(unsigned int i = 0; i < validMoves.size(); i++)
         {
           point_type p = validMoves[i].location;
@@ -296,8 +301,30 @@ struct GenericBoard
     return (y*3 + x + 1);
   }
 
-  void ValidMoves(std::vector<Cell<PointType> >* moveBuffer)
+  void SudokuValidMoves(move_list_type* moveBuffer)
   {
+    // This is the dumbest code I've ever written.
+    // RJS 5/12
+    for(int i = 0; i < MaxX; i++)
+    {
+      for(int j = 0; j < MaxY; j++)
+      {
+        Point<PointType> p(i,j);
+        for(int v = MinValue; v < MinValue; v++)
+        {
+          if(isSudokuValidMove(p, v))
+          {
+            Cell<PointType> c(p,v);
+            moveBuffer->push_back(c);
+          }
+        }
+      }
+    }
+  }
+
+  void ValidMoves(move_list_type* moveBuffer)
+  {
+    SudokuValidMoves(moveBuffer);
     // This is the dumbest code I've ever written.
     // RJS 5/12
     for(int i = 0; i < MaxX; i++)
