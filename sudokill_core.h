@@ -148,8 +148,8 @@ struct GenericBoard
     } else
     {
       Point<PointType> lastPlay = positions.back().location;
-      std::cout << "Last Play: (" << lastPlay.x << "," << lastPlay.y << ")\n";
-      std::cout << "This Play: (" << p.x << "," << p.y << ")\n";
+      //std::cout << "Last Play: (" << lastPlay.x << "," << lastPlay.y << ")\n";
+      //std::cout << "This Play: (" << p.x << "," << p.y << ")\n";
       if( (lastPlay.x == p.x) || (lastPlay.y == p.y)){
         return true;
       } else

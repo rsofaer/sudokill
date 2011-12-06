@@ -69,7 +69,7 @@ TEST(GenericBoard, isValidMove)
   EXPECT_TRUE(board.isValidMove(Point(0,1), 2));
   EXPECT_TRUE(board.isValidMove(Point(0,8), 2));
   
-  // Now play out all the moves in the relevant row and column:
+  /*// Now play out all the moves in the relevant row and column:
   board.PlayMove(Point(0,1), 2);
   board.PlayMove(Point(0,2), 3);
   board.PlayMove(Point(0,3), 4);
@@ -88,16 +88,18 @@ TEST(GenericBoard, isValidMove)
   board.PlayMove(Point(2,8), 7);
   board.PlayMove(Point(1,8), 8);
 
-  board.PlayMove(Point(0,8),9); // No moves left in column 0 and row 8.
-  EXPECT_TRUE(board.isValidMove(Point(2,2),2));
+  board.PlayMove(Point(1,8),9); // No moves left in column 0 and row 8.
+  EXPECT_TRUE(board.isValidMove(Point(2,2),2));*/
 }
 
 TEST(GenericBoard, isValidBox)
 {
   Board board;
   EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
+  EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
   board.PlayMove(Point(0,0), 1);
   EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
+  EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
 }
 
 TEST(GenericBoard, BoxNumber)
