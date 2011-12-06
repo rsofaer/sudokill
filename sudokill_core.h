@@ -154,9 +154,20 @@ struct GenericBoard
         return true;
       } else
       {
-        // This is wrong.  We must check that there are possible moves
-        // within the row/column.
-        return false;
+        move_list_type validMoves;
+        ValidMoves(validMoves);
+        for(unsigned int i = 0; i < validMoves.size(); i++)
+        {
+          point_type p = validMoves[i].location;
+          if(p.x == lastPlay.x || p.y == lastPlay.y)
+          {
+            // There is a valid move within the row or column which the last
+            // move was in.
+            return false;
+          }
+        }
+        // There are no valid moves within the row or column.
+        return true;
       }
     }
   }
