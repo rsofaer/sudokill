@@ -196,7 +196,7 @@ struct GenericBoard
   bool IsValidRow(const Point& p, int value) const
   {
     typename MoveList::const_iterator pos = positions.begin();
-    typename const MoveList::const_iterator positionsEnd = positions.end();
+    const MoveList::const_iterator positionsEnd = positions.end();
     for(; pos != positionsEnd; ++pos)
     {
       if((*pos).location.y == p.y && (*pos).value == value)
@@ -213,7 +213,7 @@ struct GenericBoard
   bool IsValidColumn(const Point& p, int value) const
   {
     typename MoveList::const_iterator pos = positions.begin();
-    typename const MoveList::const_iterator positionsEnd = positions.end();
+    const MoveList::const_iterator positionsEnd = positions.end();
     for(; pos != positionsEnd; ++pos)
     {
       if((*pos).location.x == p.x && (*pos).value == value)
@@ -295,7 +295,7 @@ struct GenericBoard
     GetBoundingBox(boxNumber,&pNW,&pSE);
 
     typename MoveList::const_iterator pos = positions.begin();
-    typename const MoveList::const_iterator positionsEnd = positions.end();
+    const MoveList::const_iterator positionsEnd = positions.end();
     for(; pos != positionsEnd; ++pos)
     {
       if(IsWithinBox(pNW, pSE, pos->location) && pos->value == value )
