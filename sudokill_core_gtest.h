@@ -10,6 +10,7 @@ namespace _hps_sudokill_core_gtest_h
 using namespace hps;
 
 typedef sudokill::GenericBoard<9, 9, int> Board;
+typedef sudokill::Point<int> Point;
 
 TEST(GenericBoard, initialization)
 {
@@ -22,10 +23,19 @@ TEST(GenericBoard, initialization)
   {
     for(int j = 0; j <= Board::MaxY; j++)
     {
-      sudokill::Point<int> point(i, j);
+      Point point(i, j);
       ASSERT_EQ(board.ValueAt(point), Board::Empty);
     }
   }
+}
+
+TEST(GenericBoard, PlayMove)
+{
+  Board board;
+  Point p(0,0);
+  ASSERT_EQ(board.ValueAt(p), Board::Empty);
+  board.PlayMove(p, 1);
+  ASSERT_EQ(board.ValueAt(p), 1);
 }
 }
 
