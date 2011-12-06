@@ -24,6 +24,10 @@ TEST(GenericBoard, initialization)
       ASSERT_EQ(board.ValueAt(point), static_cast<int>(Board::Empty));
     }
   }
+
+  Board::MoveList moves;
+  board.ValidMoves(&moves);
+  EXPECT_EQ(9 * 9 * 9, moves.size());
 }
 
 TEST(GenericBoard, PlayMove)
