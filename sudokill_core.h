@@ -111,7 +111,7 @@ struct GenericBoard
    <returns> Value at point p or -1 if the location is empty.</returns>
    */
 
-  inline int ValueAt(const Point<PointType>& p)
+  const inline int ValueAt(const Point<PointType>& p)
   {
     assert(p.x >= 0 && p.x < MaxX);
     assert(p.y >= 0 && p.y < MaxY);
@@ -127,13 +127,13 @@ struct GenericBoard
     return retVal;
   }
   
-  bool isValidMove(const Point<PointType>& p, int value)
+  const bool isValidMove(const Point<PointType>& p, int value)
   {
     return (isSudokuValidMove(p, value) && 
             isSameRowOrColumnIfPossible(p));
   }
 
-  bool isSudokuValidMove(const Point<PointType>& p, int value)
+  const bool isSudokuValidMove(const Point<PointType>& p, int value)
   {
     return ((p.x >=0 && p.x < MaxX) &&
             (p.y >= 0 && p.y < MaxY) &&
@@ -144,7 +144,7 @@ struct GenericBoard
 	          isValidBox(p, value));
   }
 
-  bool isSameRowOrColumnIfPossible(const Point<PointType>& p)
+  const bool isSameRowOrColumnIfPossible(const Point<PointType>& p)
   {
     if(positions.size() == 0)
     {
@@ -177,12 +177,12 @@ struct GenericBoard
     }
   }
 
-  bool isValidValue(int value)
+  const bool isValidValue(int value)
   {
     return value >= MinValue && value <= MaxValue;
   }
 
-  bool isValidRow(const Point<PointType>& p, int value)
+  const bool isValidRow(const Point<PointType>& p, int value)
   {
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end();++pos)
@@ -197,7 +197,7 @@ struct GenericBoard
     return true;
   }
   
-  bool isValidColumn(const Point<PointType>& p, int value)
+  const bool isValidColumn(const Point<PointType>& p, int value)
   {
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end();++pos)
@@ -212,7 +212,7 @@ struct GenericBoard
     return true;
   }
 
-  bool isEmpty(const Point<PointType>& p)
+  const bool isEmpty(const Point<PointType>& p)
   {
     typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(), positions.end(), p);
     if(pos != positions.end())
@@ -222,12 +222,12 @@ struct GenericBoard
     return true;
   }
 
-  bool isWithinBox(const Point<PointType>& NW, const Point<PointType>& SE, const Point<PointType>& p)
+  const bool isWithinBox(const Point<PointType>& NW, const Point<PointType>& SE, const Point<PointType>& p)
   {
     return (p.x >= NW.x) && (p.x >= NW.y) && (p.x <= SE.x) && (p.y <= SE.y); 
   }
 
-  void getBoundingBox(int boxNumber, 
+  const void getBoundingBox(int boxNumber, 
 		      Point<PointType>* pNW,
 		      Point<PointType>* pSE)
   {
@@ -271,7 +271,7 @@ struct GenericBoard
     //std::cout << "boxmaxx: " << boxMaxX << std::endl;
     //std::cout << "boxmaxy: " << boxMaxY << std::endl;
   }
-  bool isValidBox(const Point<PointType>& p, int value)
+  const bool isValidBox(const Point<PointType>& p, int value)
   {
     assert(p.x >=0 && p.x < MaxX);
     assert(p.y >=0 && p.y < MaxY);
@@ -294,7 +294,7 @@ struct GenericBoard
     
   }
 
-  int BoxNumber(const Point<PointType>& p)
+  const int BoxNumber(const Point<PointType>& p)
   {
     // point(3,1), grid:1
     // point(4,5), grid:5
@@ -304,9 +304,11 @@ struct GenericBoard
     return (y*3 + x + 1);
   }
 
-  void SudokuValidMoves(move_list_type* moveBuffer)
+  const void SudokuValidMoves(move_list_type* moveBuffer)
   {
     // This is the dumbest code I've ever written.
+    // Memoizing it would bring a pretty big performance benefit
+    // Cachebust on PlayMove and Undo
     // RJS 5/12
     for(int i = 0; i < MaxX; i++)
     {
@@ -331,7 +333,7 @@ struct GenericBoard
     : board(board_)
     {}
 
-    bool operator()(const Cell<PointType>& c)
+    const bool operator()(const Cell<PointType>& c)
     {
       return !(board->isSameRowOrColumnIfPossible(c.location));
     }
@@ -339,7 +341,7 @@ struct GenericBoard
     GenericBoard<MaxX_, MaxY_, PointType>* board;
   };
 
-  void ValidMoves(move_list_type* moveBuffer)
+  const void ValidMoves(move_list_type* moveBuffer)
   {
     SudokuValidMoves(moveBuffer);
     IsNotSameRowOrColumn f(this);
