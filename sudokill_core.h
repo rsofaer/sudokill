@@ -174,28 +174,12 @@ struct GenericBoard
       }
       else
       {
-        MoveList validMoves;
-        SudokuValidMoves(&validMoves);
-        const int numMoves = static_cast<int>(validMoves.size());
-        for(int i = 0; i < numMoves; ++i)
-        {
-          const Point& p = validMoves[i].location;
-          if(p.x == lastPlay.x || p.y == lastPlay.y)
-          {
-            // There is a valid move within the row or column which the last
-            // move was in.
-            return false;
-          }
-        }
-        // There are no valid moves within the row or column.
-        return true;
+        MoveList sudokuMoves;
+        SudokuValidMoves(&sudokuMoves);
+        return !(SameRowColumnMovesAvailable(sudokuMoves));
       }
     }
   }
-
-  /// <summary> Check if the point is in the same row or column as the last move
-  ///   or else that it is not possible to do so based on the legal moves.
-  /// </summary>
   bool IsSameRowOrColumnIfPossible(const Point& p, const MoveList& sudokuMoves) const
   {
     if(positions.empty())
@@ -214,21 +198,27 @@ struct GenericBoard
       }
       else
       {
-        const int numMoves = static_cast<int>(sudokuMoves.size());
-        for(int i = 0; i < numMoves; ++i)
-        {
-          const Point& p = sudokuMoves[i].location;
-          if(p.x == lastPlay.x || p.y == lastPlay.y)
-          {
-            // There is a valid move within the row or column which the last
-            // move was in.
-            return false;
-          }
-        }
-        // There are no valid moves within the row or column.
+        return !(SameRowColumnMovesAvailable(sudokuMoves));
+      }
+    }
+  }
+
+  bool SameRowColumnMovesAvailable(const MoveList& sudokuMoves) const
+  {
+    const Point& lastPlay = positions.back().location;
+    const int numMoves = static_cast<int>(sudokuMoves.size());
+    for(int i = 0; i < numMoves; ++i)
+    {
+      const Point& validMoveLocation = sudokuMoves[i].location;
+      if(validMoveLocation.x == lastPlay.x || validMoveLocation.y == lastPlay.y)
+      {
+        // There is a valid move within the row or column which the last
+        // move was in.
         return true;
       }
     }
+    // There are no valid moves within the row or column.
+    return false;
   }
 
   /// <summary> Verify that the value is in bounds. </summary>
