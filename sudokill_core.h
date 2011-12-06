@@ -103,8 +103,8 @@ struct GenericBoard
    */
   inline int ValueAt(const Point<PointType> p)
   {
-    assert(p.x >= 0 && p.x <= MaxX);
-    assert(p.y >= 0 && p.y <= MaxY);
+    assert(p.x >= 0 && p.x < MaxX);
+    assert(p.y >= 0 && p.y < MaxY);
     int retVal = Empty;
     
     typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(),positions.end(),p);
@@ -119,13 +119,18 @@ struct GenericBoard
   
   bool isValidMove(Point<PointType> p, int value)
   {
-    assert(p.x >=0 && p.x <= MaxX);
-    assert(p.y >= 0 && p.y <= MaxY);
-    
-    return (isEmpty(p) &&
-	    isValidRow(p, value) &&
-	    isValidColumn(p, value) &&
-	    isValidBox(p, value));
+    return ((p.x >=0 && p.x < MaxX) &&
+            (p.y >= 0 && p.y < MaxY) &&
+            isEmpty(p) &&
+            isValidValue(value) &&
+	          isValidRow(p, value) &&
+	          isValidColumn(p, value) &&
+	          isValidBox(p, value));
+  }
+
+  bool isValidValue(int value)
+  {
+    return value >= 1 && value <= 9;
   }
 
   bool isValidRow(const Point<PointType>& p, int value)
@@ -148,7 +153,7 @@ struct GenericBoard
     {
       if((*pos).location.x == p.x && (*pos).value == value)
       {
-	return false;
+	      return false;
       }
     }
     return true;
@@ -168,8 +173,8 @@ struct GenericBoard
 
   bool isValidBox(const Point<PointType>& p, int value)
   {
-    assert(p.x >=0 && p.x <= MaxX);
-    assert(p.y >=0 && p.y <= MaxY);
+    assert(p.x >=0 && p.x < MaxX);
+    assert(p.y >=0 && p.y < MaxY);
     int gridMinX, gridMaxX;
     int gridMinY, gridMaxY;
     
