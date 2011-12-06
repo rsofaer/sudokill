@@ -135,8 +135,8 @@ struct GenericBoard
             isValidValue(value) &&
 	          isValidRow(p, value) &&
 	          isValidColumn(p, value) &&
-	          isValidBox(p, value)) &&
-            isSameRowOrColumnIfPossible(p);
+	          isValidBox(p, value)); //&&
+            //isSameRowOrColumnIfPossible(p);
   }
 
   bool isSameRowOrColumnIfPossible(const Point<PointType>& p)

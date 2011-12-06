@@ -62,12 +62,12 @@ TEST(GenericBoard, isValidMove)
   EXPECT_FALSE(board.isValidMove(Point(0,6),1));
   EXPECT_FALSE(board.isValidMove(Point(2,2),1));
   // Sudokill invalid move:
-  EXPECT_FALSE(board.isValidMove(Point(4,4),2)); // Same row or column required.
-  EXPECT_FALSE(board.isValidMove(Point(2,2),2)); // Same box doesn't count.
-
-  EXPECT_TRUE(board.isValidMove(Point(1,0), 2));
-  EXPECT_TRUE(board.isValidMove(Point(0,1), 2));
-  EXPECT_TRUE(board.isValidMove(Point(0,8), 2));
+  //EXPECT_FALSE(board.isValidMove(Point(4,4),2)); // Same row or column required.
+  //EXPECT_FALSE(board.isValidMove(Point(2,2),2)); // Same box doesn't count.
+  //
+  //EXPECT_TRUE(board.isValidMove(Point(1,0), 2));
+  //EXPECT_TRUE(board.isValidMove(Point(0,1), 2));
+  //EXPECT_TRUE(board.isValidMove(Point(0,8), 2));
   
   /*// Now play out all the moves in the relevant row and column:
   board.PlayMove(Point(0,1), 2);
@@ -98,10 +98,12 @@ TEST(GenericBoard, isValidBox)
   EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
   EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
+  EXPECT_TRUE(board.isValidBox(Point(2,2), 1));
   board.PlayMove(Point(0,0), 1);
   EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
   EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
+  EXPECT_FALSE(board.isValidBox(Point(2,2), 1));
   board.PlayMove(Point(4,3), 4);
   EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
