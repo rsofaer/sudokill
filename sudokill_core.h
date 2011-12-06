@@ -41,6 +41,7 @@ struct Point
 /// <summary> A cell is a board location that contains a value. </summary>
 struct Cell
 {
+  Cell() : location(), value() {}
   Cell(const Point& location_, int value_)
   : location(location_),
     value(value_)
@@ -373,7 +374,8 @@ struct GenericBoard
                       moveBuffer->end());
   }
 
-  void RandomEmptyCell(Cell* c)
+  /// <summary> Find any unoccupied cell and make a move for it. </summary>
+  void RandomEmptyCell(Cell* c) const
   {
     Point p(0,0);
     for(int x = 0; x < MaxX; x++)

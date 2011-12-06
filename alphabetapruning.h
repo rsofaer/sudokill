@@ -111,11 +111,11 @@ struct AlphaBetaPruning
         {
           // Apply the ply for this state.
           Cell& mkChildPly = plys[plyIdx];
-          threadParams.state->PlayMove(mkChildPly);
+          threadParams.state.PlayMove(mkChildPly);
           // Run on the subtree.
           const int minimax = RunThread(alpha, beta, &threadParams, evalFunc);
           // Undo the ply for the next worker.
-          threadParams.state->Undo();
+          threadParams.state.Undo();
           // Collect best minimax for this thread.
           if ((-1 == threadParams.bestPlyIdx) ||
               (minimax > threadParams.bestMinimax))

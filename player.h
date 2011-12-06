@@ -12,14 +12,16 @@ struct RandomPlayer
 {
   void NextMove(const Board& board, Cell* move)
   {
-    Board::MoveList moves = board.ValidMoves();
+    Board::MoveList moves;
+    board.ValidMoves(&moves);
     if(moves.size() == 0) // We have lost!
     {
       // Pick any empty cell.
-      board->RandomEmptyCell(move);
-    }else
+      board.RandomEmptyCell(move);
+    }
+    else
     {
-      move = &(moves[math::RandBound(moves.size())]);
+      *move = moves[math::RandBound(moves.size())];
     }
   }
 };
