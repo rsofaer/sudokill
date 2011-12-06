@@ -36,7 +36,7 @@ class AlphaBetaPlayer
     {
       Board::MoveList moves;
       board.SudokuValidMoves(&moves);
-      return -static_cast<int>(moves.size());
+      return static_cast<int>(moves.size());
     }
   };
 public:
@@ -47,7 +47,7 @@ public:
     Board::MoveList sudokuMoves;
     board.SudokuValidMoves(&sudokuMoves);
     std::cout << "There are " << sudokuMoves.size() << " sudoku valid moves remaining." << std::endl;
-    if(sudokuMoves.size() > 30)
+    if(sudokuMoves.size() > 50)
     {
       RandomPlayer rand;
       rand.NextMove(board, move);
@@ -55,9 +55,10 @@ public:
     {
 
       #ifdef NDEBUG
-      params.maxDepth = 5;
+      params.maxDepth = 12;
       #else
-      params.maxDepth = 10;
+      std::cout << "In Debug mode." << std::endl;
+      params.maxDepth = 5;
       #endif
       ShrinkPossibleMovesEvaluationFunc f;
       AlphaBetaPruning::Run(&params, &const_cast<Board&>(board), &f, move);
