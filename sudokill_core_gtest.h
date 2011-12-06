@@ -50,16 +50,18 @@ TEST(GenericBoard, ValidMoves)
 {
   Board board;
   Board::move_list_type moves;
+
+  int maxMoves =  Board::MaxX * Board::MaxY * (Board::MaxValue - Board::MinValue + 1);
   
+  ASSERT_TRUE(board.isSudokuValidMove(Point(0,0),1));
   board.SudokuValidMoves(&moves);
-  EXPECT_EQ(moves.size(), Board::MaxX * Board::MaxY * (Board::MaxValue - Board::MinValue));
+  EXPECT_EQ(maxMoves, moves.size());
 
   moves.clear();
   
   board.ValidMoves(&moves);
-  EXPECT_EQ(moves.size(), Board::MaxX * Board::MaxY * (Board::MaxValue - Board::MinValue));
+  EXPECT_EQ(maxMoves, moves.size());
 }
-
 
 TEST(GenericBoard, isValidBox)
 {
@@ -73,7 +75,7 @@ TEST(GenericBoard, isValidBox)
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
   EXPECT_TRUE(board.isValidBox(Point(5,5), 6));
   EXPECT_FALSE(board.isValidBox(Point(2,2), 1));
-  //board.PlayMove(Point(0,3), 9);
+  board.PlayMove(Point(0,3), 9);
   board.PlayMove(Point(4,3), 4);
   EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
   EXPECT_TRUE(board.isValidBox(Point(0,8), 2));
@@ -189,7 +191,7 @@ TEST(GenericBoard, isValidMove)
   board.PlayMove(Point(2,8), 7);
   board.PlayMove(Point(1,8), 8);
 
-  board.PlayMove(Point(1,8),9); // No moves left in column 0 and row 8.
+  board.PlayMove(Point(0,8),9); // No moves left in column 0 and row 8.
   EXPECT_TRUE(board.isValidMove(Point(2,2),2));
 }
 }

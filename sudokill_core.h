@@ -313,7 +313,7 @@ struct GenericBoard
       for(int j = 0; j < MaxY; j++)
       {
         Point<PointType> p(i,j);
-        for(int v = MinValue; v < MinValue; v++)
+        for(int v = MinValue; v <= MaxValue; v++)
         {
           if(isSudokuValidMove(p, v))
           {
@@ -325,15 +325,15 @@ struct GenericBoard
     }
   }
 
-  struct IsSudoKillValidFunctor
+  struct IsNotSameRowOrColumn
   {
-    IsSudoKillValidFunctor(GenericBoard<MaxX_, MaxY_, PointType>* board_)
+    IsNotSameRowOrColumn(GenericBoard<MaxX_, MaxY_, PointType>* board_)
     : board(board_)
     {}
 
     bool operator()(const Cell<PointType>& c)
     {
-      return board->isSameRowOrColumnIfPossible(c.location);
+      return !(board->isSameRowOrColumnIfPossible(c.location));
     }
 
     GenericBoard<MaxX_, MaxY_, PointType>* board;
@@ -342,7 +342,7 @@ struct GenericBoard
   void ValidMoves(move_list_type* moveBuffer)
   {
     SudokuValidMoves(moveBuffer);
-    IsSudoKillValidFunctor f(this);
+    IsNotSameRowOrColumn f(this);
     moveBuffer->erase(remove_if(moveBuffer->begin(), 
                                 moveBuffer->end(),
                                 f),
