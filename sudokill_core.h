@@ -269,25 +269,22 @@ struct GenericBoard
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end(); ++pos)
     {
-      std::cout << "value: " <<std::endl;
-      std::cout << "pos->value: "<<pos->value<<std::endl;
+      //std::cout << "value: " <<std::endl;
+      //std::cout << "pos->value: "<<pos->value<<std::endl;
 
       if(isWithinBox(pNW, pSE, pos->location) && pos->value == value )
       {
-	std::cout << "isValidRow returned false" <<std::endl;
+	//std::cout << "isValidRow returned false" <<std::endl;
         return false;
       }
     }
-    std::cout << "isValidRow returned true" <<std::endl;
+    //std::cout << "isValidRow returned true" <<std::endl;
     return true;
     
   }
 
   int BoxNumber(const Point<PointType>& p)
   {
-    // point(3,1), grid:1
-    // point(4,5), grid:5
-    // point(6,3), grid:6
     int x = (p.x)/3;
     int y = (p.y)/3;
     return (y*3 + x + 1);
