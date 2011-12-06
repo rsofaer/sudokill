@@ -145,29 +145,6 @@ struct AlphaBetaPruning
     }
 
     --depth;
-    if (std::numeric_limits<int>::min() == minimax)
-    {
-//      std::cout << "No guaranteed victory." << std::endl;
-      // Select ply based on heuristic.
-      // This is the space for tuning heuristics that work when there is no guaranteed win.
-      state->PlayMove(plys.front());
-      int bestPlyScore = (*evalFunc)(*state);
-      *ply = plys.front();
-      state->Undo();
-      for (Board::MoveList::const_iterator testPly = plys.begin();
-           testPly != plys.end();
-           ++testPly)
-      {
-        state->PlayMove(*testPly);
-        int plyScore = (*evalFunc)(*state);
-        if (plyScore > bestPlyScore)
-        {
-          bestPlyScore = plyScore;
-          *ply = *testPly;
-        }
-        state->Undo();
-      }
-    }
     return minimax;
   }
 

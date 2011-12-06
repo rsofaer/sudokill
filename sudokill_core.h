@@ -60,7 +60,7 @@ struct GenericBoard
   // max y value.
   enum {MaxY = MaxY_,};
 
-  enum { Empty = -1, };
+  enum { Empty = 0, };
   enum { MinValue = 1, };
   enum { MaxValue = 9, };
 
@@ -101,6 +101,8 @@ struct GenericBoard
 
   inline void PlayMove(const Cell& c)
   {
+    //PrintBoard();
+    //std::cout << "Playing value: " << c.value << " at: (" << c.location.x << "," << c.location.y << ")" << std::endl;
     PlayMove(c.location, c.value);
   }
   
@@ -425,6 +427,24 @@ struct GenericBoard
         }
       }
     }
+  }
+
+  void PrintBoard() const
+  {
+    std::cout << "  012 345 678  " << std::endl;
+    std::cout << "  ____________ " << std::endl;
+    std::cout << "0|" << ValueAt(Point(0,0)) << ValueAt(Point(0,1)) << ValueAt(Point(0,2))<<"|" << ValueAt(Point(0,3)) << ValueAt(Point(0,4)) << ValueAt(Point(0,5)) <<"|"<< ValueAt(Point(0,6)) << ValueAt(Point(0,7)) << ValueAt(Point(0,8)) << "|" << std::endl;
+    std::cout << "1|" << ValueAt(Point(1,0)) << ValueAt(Point(1,1)) << ValueAt(Point(1,2))<<"|" << ValueAt(Point(1,3)) << ValueAt(Point(1,4)) << ValueAt(Point(1,5)) <<"|"<< ValueAt(Point(1,6)) << ValueAt(Point(1,7)) << ValueAt(Point(1,8)) << "|" << std::endl;
+    std::cout << "2|" << ValueAt(Point(2,0)) << ValueAt(Point(2,1)) << ValueAt(Point(2,2))<<"|" << ValueAt(Point(2,3)) << ValueAt(Point(2,4)) << ValueAt(Point(2,5)) <<"|"<< ValueAt(Point(2,6)) << ValueAt(Point(2,7)) << ValueAt(Point(2,8)) << "|" << std::endl;
+    std::cout << " |---|---|---| " << std::endl;
+    std::cout << "3|" << ValueAt(Point(3,0)) << ValueAt(Point(3,1)) << ValueAt(Point(3,2))<<"|" << ValueAt(Point(3,3)) << ValueAt(Point(3,4)) << ValueAt(Point(3,5)) <<"|"<< ValueAt(Point(3,6)) << ValueAt(Point(3,7)) << ValueAt(Point(3,8)) << "|" << std::endl;
+    std::cout << "4|" << ValueAt(Point(4,0)) << ValueAt(Point(4,1)) << ValueAt(Point(4,2))<<"|" << ValueAt(Point(4,3)) << ValueAt(Point(4,4)) << ValueAt(Point(4,5)) <<"|"<< ValueAt(Point(4,6)) << ValueAt(Point(4,7)) << ValueAt(Point(4,8)) << "|" << std::endl;
+    std::cout << "5|" << ValueAt(Point(5,0)) << ValueAt(Point(5,1)) << ValueAt(Point(5,2))<<"|" << ValueAt(Point(5,3)) << ValueAt(Point(5,4)) << ValueAt(Point(5,5)) <<"|"<< ValueAt(Point(5,6)) << ValueAt(Point(5,7)) << ValueAt(Point(5,8)) << "|" << std::endl;
+    std::cout << " |---|---|---| " << std::endl;
+    std::cout << "6|" << ValueAt(Point(6,0)) << ValueAt(Point(6,1)) << ValueAt(Point(6,2))<<"|" << ValueAt(Point(6,3)) << ValueAt(Point(6,4)) << ValueAt(Point(6,5)) <<"|"<< ValueAt(Point(6,6)) << ValueAt(Point(6,7)) << ValueAt(Point(6,8)) << "|" << std::endl;
+    std::cout << "7|" << ValueAt(Point(7,0)) << ValueAt(Point(7,1)) << ValueAt(Point(7,2))<<"|" << ValueAt(Point(7,3)) << ValueAt(Point(7,4)) << ValueAt(Point(7,5)) <<"|"<< ValueAt(Point(7,6)) << ValueAt(Point(7,7)) << ValueAt(Point(7,8)) << "|" << std::endl;
+    std::cout << "8|" << ValueAt(Point(8,0)) << ValueAt(Point(8,1)) << ValueAt(Point(8,2))<<"|" << ValueAt(Point(8,3)) << ValueAt(Point(8,4)) << ValueAt(Point(8,5)) <<"|"<< ValueAt(Point(8,6)) << ValueAt(Point(8,7)) << ValueAt(Point(8,8)) << "|" << std::endl;
+    std::cout << " |---|---|---  " << std::endl;
   }
 };
 

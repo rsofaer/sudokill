@@ -43,7 +43,7 @@ public:
   /// <summary> Return the next move for the player. </summary>
   void NextMove(const Board& board, Cell* move)
   {
-    params.maxDepth = 3;
+    params.maxDepth = 2;
     ShrinkPossibleMovesEvaluationFunc f;
     AlphaBetaPruning::Run(&params, &const_cast<Board&>(board), &f, move);
   }
