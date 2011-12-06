@@ -175,43 +175,43 @@ struct GenericBoard
   {
     assert(p.x >=0 && p.x < MaxX);
     assert(p.y >=0 && p.y < MaxY);
-    int gridMinX, gridMaxX;
-    int gridMinY, gridMaxY;
+    int boxMinX, boxMaxX;
+    int boxMinY, boxMaxY;
     
-    int gridNumber = BoxNumber(p);
-    switch(gridNumber)
+    int boxNumber = BoxNumber(p);
+    switch(boxNumber)
     {
     case 1:
-      gridMinX = 0; gridMaxX = 2; gridMinY = 0; gridMaxY = 2; 
+      boxMinX = 0; boxMaxX = 2; boxMinY = 0; boxMaxY = 2; 
       break;
     case 2:
-      gridMinX = 3; gridMaxX = 5; gridMinY = 0; gridMaxY = 2;
+      boxMinX = 3; boxMaxX = 5; boxMinY = 0; boxMaxY = 2;
       break;
     case 3:
-      gridMinX = 6; gridMaxX = 8; gridMinY = 0; gridMaxY = 2; 
+      boxMinX = 6; boxMaxX = 8; boxMinY = 0; boxMaxY = 2; 
       break;
     case 4:
-      gridMinX = 0; gridMaxX = 2; gridMinY = 3; gridMaxY = 5;
+      boxMinX = 0; boxMaxX = 2; boxMinY = 3; boxMaxY = 5;
       break;
     case 5:
-      gridMinX = 3; gridMaxX = 5; gridMinY = 3; gridMaxY = 5; 
+      boxMinX = 3; boxMaxX = 5; boxMinY = 3; boxMaxY = 5; 
       break;
     case 6:
-      gridMinX = 6; gridMaxX = 8; gridMinY = 3; gridMaxY = 5;
+      boxMinX = 6; boxMaxX = 8; boxMinY = 3; boxMaxY = 5;
       break;
     case 7:
-      gridMinX = 0; gridMaxX = 2; gridMinY = 6; gridMaxY = 8; 
+      boxMinX = 0; boxMaxX = 2; boxMinY = 6; boxMaxY = 8; 
       break;
     case 8:
-      gridMinX = 3; gridMaxX = 5; gridMinY = 6; gridMaxY = 8;
+      boxMinX = 3; boxMaxX = 5; boxMinY = 6; boxMaxY = 8;
       break;
     case 9:
-      gridMinX = 6; gridMaxX = 8; gridMinY = 6; gridMaxY = 8; 
+      boxMinX = 6; boxMaxX = 8; boxMinY = 6; boxMaxY = 8; 
       break;
     }
     
-    Point<PointType> pNW(gridMinX,gridMinY);
-    Point<PointType> pSE(gridMaxX,gridMaxY);
+    Point<PointType> pNW(boxMinX,boxMinY);
+    Point<PointType> pSE(boxMaxX,boxMaxY);
     
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end(); ++pos)
