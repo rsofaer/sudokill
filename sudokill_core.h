@@ -160,7 +160,7 @@ struct GenericBoard
       } else
       {
         move_list_type validMoves;
-        ValidMoves(&validMoves);
+        SudokuValidMoves(&validMoves);
         for(unsigned int i = 0; i < validMoves.size(); i++)
         {
           point_type p = validMoves[i].location;
@@ -325,26 +325,28 @@ struct GenericBoard
     }
   }
 
+  struct IsSudoKillValidFunctor
+  {
+    IsSudoKillValidFunctor(GenericBoard<MaxX_, MaxY_, PointType>* board_)
+    : board(board_)
+    {}
+
+    bool operator()(const Cell<PointType>& c)
+    {
+      return board->isSameRowOrColumnIfPossible(c.location);
+    }
+
+    GenericBoard<MaxX_, MaxY_, PointType>* board;
+  };
+
   void ValidMoves(move_list_type* moveBuffer)
   {
     SudokuValidMoves(moveBuffer);
-    // This is the dumbest code I've ever written.
-    // RJS 5/12
-    for(int i = 0; i < MaxX; i++)
-    {
-      for(int j = 0; j < MaxY; j++)
-      {
-        Point<PointType> p(i,j);
-        for(int v = MinValue; v < MinValue; v++)
-        {
-          if(isValidMove(p, v))
-          {
-            Cell<PointType> c(p,v);
-            moveBuffer->push_back(c);
-          }
-        }
-      }
-    }
+    IsSudoKillValidFunctor f(this);
+    moveBuffer->erase(remove_if(moveBuffer->begin(), 
+                                moveBuffer->end(),
+                                f),
+                      moveBuffer->end());
   }
 
 };
