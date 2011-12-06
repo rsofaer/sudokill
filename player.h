@@ -40,11 +40,10 @@ class AlphaBetaPlayer
     }
   };
 public:
-  AlphaBetaPlayer();
-
   /// <summary> Return the next move for the player. </summary>
   void NextMove(const Board& board, Cell* move)
   {
+    params.maxDepth = 3;
     ShrinkPossibleMovesEvaluationFunc f;
     AlphaBetaPruning::Run(&params, &const_cast<Board&>(board), &f, move);
   }
@@ -54,5 +53,6 @@ private:
 };
 
 }
+using namespace sudokill;
 }
 #endif // _SUDOKILL_PLAYER_H
