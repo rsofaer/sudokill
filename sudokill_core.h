@@ -397,7 +397,7 @@ struct GenericBoard
 
 typedef sudokill::GenericBoard<9, 9> Board;
 
-inline void AnyPlyWillDo(Board* board, Cell* cell)
+inline void AnyPlyWillDo(const Board* board, Cell* cell)
 {
   board->RandomEmptyCell(cell);
 }
