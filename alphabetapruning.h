@@ -19,16 +19,16 @@ struct AlphaBetaPruning
         maxDepth(-1),
         bestMinimax(0),
         bestPlyIdx(-1),
-        dfsPlys(State::NumRemoved + (2 * Player::NumWeights) - 2),
+        dfsPlys(Board::NumRemoved + (2 * Player::NumWeights) - 2),
         victoryIsMine(NULL)
     {}
 
-    State state;
+    Board state;
     int depth;
     int maxDepth;
     int bestMinimax;
     int bestPlyIdx;
-    std::vector<std::vector<Ply> > dfsPlys;
+    std::vector<Board::MoveList > dfsPlys;
     volatile bool* victoryIsMine;
   };
 
@@ -36,39 +36,28 @@ struct AlphaBetaPruning
   struct Params
   {
     Params()
-      : maxDepthAdding(3),
-        maxDepthRemoving(8),
+      : maxDepth(3),
         depth(0),
         rootPlys(),
         threadData()
     {}
 
-    int maxDepthAdding;
-    int maxDepthRemoving;
+    int maxDepth;
     int depth;
-    std::vector<Ply> rootPlys;
+    Board::MoveList rootPlys;
     std::vector<ThreadParams> threadData;
   };
 
   /// <summary> Run alpha-beta pruning to get the ply for the state. </summary>
   template <typename BoardEvaulationFunction>
   static int Run(Params* params,
-                 State* state,
+                 Board* state,
                  const BoardEvaulationFunction* evalFunc,
-                 Ply* ply)
+                 Cell* ply)
   {
     assert(params && state && evalFunc && ply);
-    assert(!Tipped(state->board));
 
-    int maxDepth;
-    if (State::Phase_Adding == state->phase)
-    {
-      maxDepth = params->maxDepthAdding;
-    }
-    else
-    {
-      maxDepth = params->maxDepthRemoving;
-    }
+    const int maxDepth = params->maxDepth;
     int& depth = params->depth;
     assert(maxDepth > 1);
     assert(depth < maxDepth);
@@ -77,10 +66,10 @@ struct AlphaBetaPruning
     ++depth;
 
     // Get the children of the current state.
-    std::vector<Ply>& plys = params->rootPlys;
+    Board::MoveList& plys = params->rootPlys;
     plys.clear();
-    PossiblePlys(*state, &plys);
-    std::sort(plys.begin(), plys.end(), PlyTorqueComp(state));
+    state->ValidMoves(&plys);
+    //std::sort(plys.begin(), plys.end(), PlyTorqueComp(state));
     // A leaf has no non-suicidal moves. Who won?
     volatile bool victoryIsMine = false;
     int minimax;
@@ -121,12 +110,12 @@ struct AlphaBetaPruning
         if (!victoryIsMine)
         {
           // Apply the ply for this state.
-          Ply& mkChildPly = plys[plyIdx];
-          DoPly(mkChildPly, &threadParams.state);
+          Cell& mkChildPly = plys[plyIdx];
+          threadParams.state->PlayMove(mkChildPly);
           // Run on the subtree.
           const int minimax = RunThread(alpha, beta, &threadParams, evalFunc);
           // Undo the ply for the next worker.
-          UndoPly(mkChildPly, &threadParams.state);
+          threadParams.state->Undo();
           // Collect best minimax for this thread.
           if ((-1 == threadParams.bestPlyIdx) ||
               (minimax > threadParams.bestMinimax))
@@ -158,58 +147,36 @@ struct AlphaBetaPruning
     {
 //      std::cout << "No guaranteed victory." << std::endl;
       // Select ply based on heuristic.
-      DoPly(plys.front(), state);
+      // This is the space for tuning heuristics that work when there is no guaranteed win.
+      state->PlayMove(plys.front());
       int bestPlyScore = (*evalFunc)(*state);
       *ply = plys.front();
-      UndoPly(plys.front(), state);
-      for (std::vector<Ply>::const_iterator testPly = plys.begin();
+      state->Undo();
+      for (Board::MoveList::const_iterator testPly = plys.begin();
            testPly != plys.end();
            ++testPly)
       {
-        DoPly(*testPly, state);
+        state->PlayMove(*testPly);
         int plyScore = (*evalFunc)(*state);
         if (plyScore > bestPlyScore)
         {
           bestPlyScore = plyScore;
           *ply = *testPly;
         }
-        UndoPly(*testPly, state);
+        state->Undo();
       }
     }
     return minimax;
   }
 
 private:
-  /// <summary> Sort plys for maximum torque. </summary>
-  struct PlyTorqueComp
-  {
-    PlyTorqueComp(const State* state_)
-    : state(state_)
-    {}
-
-    inline bool operator()(const Ply& lhs, const Ply& rhs)
-    {
-      if (lhs.wIdx >= 0)
-      {
-        const Weight* hand = CurrentPlayer(state)->hand;
-        return abs(lhs.pos * hand[lhs.wIdx]) > abs(rhs.pos * hand[rhs.wIdx]);
-      }
-      else
-      {
-        const Board& board = state->board;
-        return abs(lhs.pos * board[lhs.pos]) > abs(rhs.pos * board[rhs.pos]);
-      }
-    }
-
-    const State* state;
-  };
 
   inline static bool IdentifyMax(const int depth)
   {
     return depth & 1;
   }
 
-  inline static int ScoreLeaf(const int depth, State* state, Ply* ply)
+  inline static int ScoreLeaf(const int depth, Board* state, Cell* ply)
   {
     AnyPlyWillDo(state, ply);
     if (IdentifyMax(depth))
@@ -253,7 +220,7 @@ private:
   {
     assert(params && evalFunc);
 
-    State* state = &params->state;
+    Board* state = &params->state;
     volatile bool* victoryIsMine = params->victoryIsMine;
     // Score all plys to find minimax.
     MinimaxFunc minimaxFunc;
@@ -265,13 +232,13 @@ private:
         *minimax = 0;
         break;
       }
-      DoPly(*testPly, state);
+      state->PlayMove(*testPly);
       int score = RunThread(*alpha, *beta, params, evalFunc);
       if (minimaxFunc(score, *minimax))
       {
         *minimax = score;
       }
-      UndoPly(*testPly, state);
+      state->Undo();
       if (*alpha >= *beta)
       {
         break;
@@ -289,16 +256,15 @@ private:
 
     int& depth = params->depth;
     const int& maxDepth = params->maxDepth;
-    State* state = &params->state;
-    assert(!Tipped(state->board));
+    Board* state = &params->state;
     assert(depth < maxDepth);
     ++depth;
 
     // Get the children of the current state.
-    std::vector<Ply>& plys = params->dfsPlys[params->depth - 2];
+    Board::MoveList& plys = params->dfsPlys[params->depth - 2];
     plys.clear();
-    PossiblePlys(*state, &plys);
-    std::sort(plys.begin(), plys.end(), PlyTorqueComp(state));
+    state->ValidMoves(&plys);
+    //std::sort(plys.begin(), plys.end(), PlyTorqueComp(state));
     // Collect incoming a and b.
     int alpha = a;
     int beta = b;
@@ -306,7 +272,7 @@ private:
     int minimax;
     if (plys.empty())
     {
-      Ply tossPly;
+      Cell tossPly;
       minimax = ScoreLeaf(depth, state, &tossPly);
     }
     // If depth bound reached, return score current state.
@@ -317,11 +283,11 @@ private:
     else
     {
       // Init score.
-      std::vector<Ply>::const_iterator testPly = plys.begin();
+      Board::MoveList::const_iterator testPly = plys.begin();
       {
-        DoPly(*testPly, state);
+        state->PlayMove(*testPly);
         minimax = RunThread(alpha, beta, params, evalFunc);
-        UndoPly(*testPly, state);
+        state->Undo();
       }
       // If I am MAX, then maximize my score.
       if (IdentifyMax(depth))

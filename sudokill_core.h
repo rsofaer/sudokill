@@ -96,6 +96,11 @@ struct GenericBoard
     //position is set by creating an object of type Cell.
     positions.push_back(Cell(p,value));
   }
+
+  inline void PlayMove(const Cell& c)
+  {
+    PlayMove(c.location, c.value);
+  }
   
   /// <summary> This function is used to Undo the last move.</summary>
   inline void Undo()
@@ -368,6 +373,7 @@ struct GenericBoard
   }
 };
 
+typedef sudokill::GenericBoard<9, 9> Board;
 } // end ns sudokill
 using namespace sudokill;
 } // end ns hps

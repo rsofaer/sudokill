@@ -9,8 +9,6 @@ namespace _hps_sudokill_core_gtest_h
 {
 using namespace hps;
 
-typedef sudokill::GenericBoard<9, 9> Board;
-
 TEST(GenericBoard, initialization)
 {
 
