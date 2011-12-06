@@ -6,6 +6,7 @@
 #include <functional>
 #include <assert.h>
 #include <iostream>
+#include "rand_bound.h"
 
 namespace hps 
 {
@@ -381,10 +382,11 @@ struct GenericBoard
       {
         p.x = x;
         p.y = y;
-        if(isEmpty(p))
+        if(!Occupied(p))
         {
-          c.location = p;
-          c.value = math::RandBound(MaxValue + 1);
+          c->location = p;
+          c->value = math::RandBound(MaxValue + 1);
+          return;
         }
       }
     }
@@ -392,6 +394,12 @@ struct GenericBoard
 };
 
 typedef sudokill::GenericBoard<9, 9> Board;
+
+void AnyPlyWillDo(Board* board, Cell* cell)
+{
+  board->RandomEmptyCell(cell);
+}
+
 } // end ns sudokill
 using namespace sudokill;
 } // end ns hps
