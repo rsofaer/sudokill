@@ -16,6 +16,7 @@ namespace sudokill
       if(moves.size() == 0) // We have lost!
       {
         // Pick any empty cell.
+        board->RandomEmptyCell(move);
       }else
       {
         move = &(moves[math::RandBound(moves.size())]);
