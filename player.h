@@ -44,13 +44,17 @@ public:
   void NextMove(const Board& board, Cell* move)
   {
     // Pick a random spot if it's early in the game.
-    if(board.positions.size() < 2)
+    if(board.positions.size() < 20)
     {
       RandomPlayer rand;
       rand.NextMove(board, move);
     }else
     {
-      params.maxDepth = 3;
+      #ifdef NDEBUG
+      params.maxDepth = 5;
+      #else
+      params.maxDepth = 9;
+      #endif
       ShrinkPossibleMovesEvaluationFunc f;
       AlphaBetaPruning::Run(&params, &const_cast<Board&>(board), &f, move);
     }
