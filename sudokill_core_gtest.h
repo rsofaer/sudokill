@@ -174,16 +174,15 @@ TEST(GenericBoard, IsValidMove)
   board.PlayMove(Point(0,6), 7);
   board.PlayMove(Point(0,7), 8);
   // The Column is full, play across the board to get to the row:
-  board.PlayMove(Point(8,7), 9);
-  board.PlayMove(Point(8,8), 1);
-  board.PlayMove(Point(7,8), 2);
-  board.PlayMove(Point(6,8), 3);
-  board.PlayMove(Point(5,8), 4);
-  board.PlayMove(Point(4,8), 5);
-  board.PlayMove(Point(3,8), 6);
-  board.PlayMove(Point(2,8), 7);
-  board.PlayMove(Point(1,8), 8);
-
+  board.PlayMove(Point(8,7), 4);
+  board.PlayMove(Point(8,8), 8);
+  board.PlayMove(Point(7,8), 7);
+  board.PlayMove(Point(6,8), 6);
+  board.PlayMove(Point(5,8), 5);
+  board.PlayMove(Point(4,8), 4);
+  board.PlayMove(Point(3,8), 3);
+  board.PlayMove(Point(2,8), 2);
+  board.PlayMove(Point(1,8), 1);
   board.PlayMove(Point(0,8),9); // No moves left in column 0 and row 8.
   EXPECT_TRUE(board.IsValidMove(Point(2,2),9));
 }
