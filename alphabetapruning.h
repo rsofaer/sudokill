@@ -148,12 +148,15 @@ struct AlphaBetaPruning
     if(minimax == std::numeric_limits<int>::max())
     {
       std::cout << "AlphaBeta found a guaranteed win." << std::endl;
-    }else if(minimax == std::numeric_limits<int>::min())
+    }
+    else if(minimax == std::numeric_limits<int>::min())
     {
       std::cout << "AlphaBeta found a guaranteed loss." << std::endl;
-    }else
+    }
+    else
     {
-      std::cout << "AlphaBeta did not find a guaranteed win or loss." << std::endl;
+      std::cout << "AlphaBeta did not find a guaranteed win or loss."
+                << std::endl;
     }
     return minimax;
   }

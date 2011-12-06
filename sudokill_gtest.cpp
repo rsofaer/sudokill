@@ -1,4 +1,5 @@
 #include "sudokill_core_gtest.h"
+#include "board_parser_gtest.h"
 #include "player_gtest.h"
 #include "gtest/gtest.h"
 #ifdef WIN32
