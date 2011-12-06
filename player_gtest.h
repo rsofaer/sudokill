@@ -51,7 +51,7 @@ TEST(AlphaBetaVsRandom, PlayerBattle)
   }
   EXPECT_EQ(winner, abv);
   EXPECT_TRUE(total_time < 115);
-  std::cout << "The winner is " << winner << "." << std::endl;
+  std::cout << "After " << total_time << " seconds, the winner is " << winner << "." << std::endl;
 }
 
 }
