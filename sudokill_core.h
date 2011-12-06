@@ -65,7 +65,13 @@ struct GenericBoard
   // max y value.
   enum {MaxY = MaxY_,};
 
-  enum {Empty = -1,};
+  enum {Empty = -1,
+        MinValue = 1,
+        MaxValue = 9};
+
+  typedef Point<PointType> point_type;
+  typedef Cell<PointType> move_type;
+  typedef std::vector<move_type> move_list_type;
   
   std::vector<Cell<PointType> > positions;
   
@@ -157,7 +163,7 @@ struct GenericBoard
 
   bool isValidValue(int value)
   {
-    return value >= 1 && value <= 9;
+    return value >= MinValue && value <= MaxValue;
   }
 
   bool isValidRow(const Point<PointType>& p, int value)
@@ -272,6 +278,27 @@ struct GenericBoard
     int x = (p.x)/3;
     int y = (p.y)/3;
     return (y*3 + x + 1);
+  }
+
+  void ValidMoves(std::vector<Cell<PointType> >* moveBuffer)
+  {
+    // This is the dumbest code I've ever written.
+    // RJS 5/12
+    for(int i = 0; i < MaxX; i++)
+    {
+      for(int j = 0; j < MaxY; j++)
+      {
+        Point<PointType> p(i,j);
+        for(int v = MinValue; v < MinValue; v++)
+        {
+          if(isValidMove(p, v))
+          {
+            Cell<PointType> c(p,v);
+            moveBuffer.push(c);
+          }
+        }
+      }
+    }
   }
 
 };

@@ -157,6 +157,10 @@ TEST(GenericBoard, getBoundingBox)
   
 }
 
+TEST(GenericBoard, ValidMoves)
+{
+  Board board;
+}
 
 }
 
