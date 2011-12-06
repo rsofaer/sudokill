@@ -430,7 +430,7 @@ struct GenericBoard
         if(!Occupied(p))
         {
           c->location = p;
-          c->value = math::RandBound(MaxValue + 1);
+          c->value = math::RandBound(MaxValue) + 1;
           return;
         }
       }
