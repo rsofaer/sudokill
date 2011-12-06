@@ -78,8 +78,8 @@ struct GenericBoard
    */
   inline void PlayMove(Point<PointType> p, int value)
   {
-    assert(p.x >= 0 && p.x <= MaxX);
-    assert(p.y >= 0 && p.y <= MaxY);
+    assert(p.x >= 0 && p.x < MaxX);
+    assert(p.y >= 0 && p.y < MaxY);
     
     typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(),positions.end(),p);
     
@@ -106,7 +106,7 @@ struct GenericBoard
    <parameters> A generic point Point</parameters>
    <returns> Value at point p or -1 if the location is empty.</returns>
    */
-  inline int ValueAt(Point<PointType> p)
+  inline int ValueAt(const Point<PointType> p)
   {
     assert(p.x >= 0 && p.x <= MaxX);
     assert(p.y >= 0 && p.y <= MaxY);
@@ -122,7 +122,7 @@ struct GenericBoard
     return retVal;
   }
   
-  bool ValidMove(Point<PointType> p, int value)
+  bool isValidMove(const Point<PointType> p, int value)
   {
     assert(p.x >=0 && p.x <= MaxX);
     assert(p.y >= 0 && p.y <= MaxY);
@@ -223,6 +223,9 @@ struct GenericBoard
 
   int GridNumber(const Point<PointType>& p)
   {
+    // point(3,1), grid:1
+    // point(4,5), grid:5
+    // point(6,3), grid:
     int x = (p.x)/3;
     int y = (p.y)/3;
     return (y*3 + x + 1);
