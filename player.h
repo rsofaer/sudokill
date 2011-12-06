@@ -44,16 +44,20 @@ public:
   void NextMove(const Board& board, Cell* move)
   {
     // Pick a random spot if it's early in the game.
-    if(board.positions.size() < 20)
+    Board::MoveList sudokuMoves;
+    board.SudokuValidMoves(&sudokuMoves);
+    std::cout << "There are " << sudokuMoves.size() << " sudoku valid moves remaining." << std::endl;
+    if(sudokuMoves.size() > 30)
     {
       RandomPlayer rand;
       rand.NextMove(board, move);
     }else
     {
+
       #ifdef NDEBUG
       params.maxDepth = 5;
       #else
-      params.maxDepth = 9;
+      params.maxDepth = 10;
       #endif
       ShrinkPossibleMovesEvaluationFunc f;
       AlphaBetaPruning::Run(&params, &const_cast<Board&>(board), &f, move);

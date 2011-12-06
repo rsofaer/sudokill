@@ -41,6 +41,7 @@ TEST(AlphaBetaVsRandom, PlayerBattle)
       }
       board.PlayMove(move);
     }
+    std::cout << "Played a round." << std::endl;
   }
   std::cout << "The winner is " << winner << "." << std::endl;
 }
