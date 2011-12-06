@@ -193,6 +193,44 @@ struct GenericBoard
     }
   }
 
+  /// <summary> Check if the point is in the same row or column as the last move
+  ///   or else that it is not possible to do so based on the legal moves.
+  /// </summary>
+  bool IsSameRowOrColumnIfPossible(const Point& p, const MoveList& sudokuMoves) const
+  {
+    if(positions.empty())
+    {
+      // Allow any move if this is the first move.
+      return true;
+    }
+    else
+    {
+      const Point& lastPlay = positions.back().location;
+      //std::cout << "Last Play: (" << lastPlay.x << "," << lastPlay.y << ")\n";
+      //std::cout << "This Play: (" << p.x << "," << p.y << ")\n";
+      if( (lastPlay.x == p.x) || (lastPlay.y == p.y))
+      {
+        return true;
+      }
+      else
+      {
+        const int numMoves = static_cast<int>(sudokuMoves.size());
+        for(int i = 0; i < numMoves; ++i)
+        {
+          const Point& p = sudokuMoves[i].location;
+          if(p.x == lastPlay.x || p.y == lastPlay.y)
+          {
+            // There is a valid move within the row or column which the last
+            // move was in.
+            return false;
+          }
+        }
+        // There are no valid moves within the row or column.
+        return true;
+      }
+    }
+  }
+
   /// <summary> Verify that the value is in bounds. </summary>
   bool IsValidValue(int value) const
   {
@@ -352,12 +390,16 @@ struct GenericBoard
   /// </summary>
   struct IsNotSameRowOrColumn
   {
-    IsNotSameRowOrColumn(const GenericBoard* board_) : board(board_) {}
+    IsNotSameRowOrColumn(const GenericBoard* board_, const MoveList& sudokuMoves_) :
+      board(board_),
+      sudokuMoves(&sudokuMoves_)
+    {}
     inline bool operator()(const Cell& c) const
     {
-      return !(board->IsSameRowOrColumnIfPossible(c.location));
+      return !(board->IsSameRowOrColumnIfPossible(c.location, *sudokuMoves));
     }
     const GenericBoard* board;
+    const MoveList* sudokuMoves;
   };
 
   /// <summary> Filter valid Sudoku moves based upon Sudokill rules. <summary>
@@ -365,9 +407,10 @@ struct GenericBoard
   {
     assert(moveBuffer);
     SudokuValidMoves(moveBuffer);
+    MoveList sudokuMoves(*moveBuffer);
     moveBuffer->erase(remove_if(moveBuffer->begin(), 
                                 moveBuffer->end(),
-                                IsNotSameRowOrColumn(this)),
+                                IsNotSameRowOrColumn(this, sudokuMoves)),
                       moveBuffer->end());
   }
 
