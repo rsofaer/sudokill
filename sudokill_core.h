@@ -173,9 +173,11 @@ struct GenericBoard
     {
       if((*pos).location.y == p.y && (*pos).value == value)
       {
+	//std::cout << "isValidRow returned false" << std::endl;
         return false;
       }
     }
+    //    std::cout << "isValidRow returned true" <<std::endl;
     return true;
   }
   
@@ -186,9 +188,11 @@ struct GenericBoard
     {
       if((*pos).location.x == p.x && (*pos).value == value)
       {
+	//std::cout << "isValidColumn returned false" <<std::endl;
         return false;
       }
     }
+    //    std::cout << "isValidColumn returned true" <<std::endl;
     return true;
   }
 
@@ -246,18 +250,18 @@ struct GenericBoard
     }
     pNW->x = boxMinX; pNW->y = boxMinY;
     pSE->x = boxMaxX; pSE->y = boxMaxY;
-    std::cout << "boxminx: " << boxMinX << std::endl;
-    std::cout << "boxminy: " << boxMinY << std::endl;
-    std::cout << "boxmaxx: " << boxMaxX << std::endl;
-    std::cout << "boxmaxy: " << boxMaxY << std::endl;
+    //std::cout << "boxminx: " << boxMinX << std::endl;
+    //std::cout << "boxminy: " << boxMinY << std::endl;
+    //std::cout << "boxmaxx: " << boxMaxX << std::endl;
+    //std::cout << "boxmaxy: " << boxMaxY << std::endl;
   }
   bool isValidBox(const Point<PointType>& p, int value)
   {
     assert(p.x >=0 && p.x < MaxX);
     assert(p.y >=0 && p.y < MaxY);
-    std::cout << "value: " << value <<std::endl;
+    //std::cout << "value: " << value <<std::endl;
     int boxNumber = BoxNumber(p);
-    std::cout << "box Number: " << boxNumber <<std::endl;
+    //std::cout << "box Number: " << boxNumber <<std::endl;
     Point<PointType> pNW;
     Point<PointType> pSE;
     getBoundingBox(boxNumber,&pNW,&pSE);
@@ -265,12 +269,16 @@ struct GenericBoard
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end(); ++pos)
     {
-      if(!isWithinBox(pNW, pSE, pos->location) && pos->value == value )
+      std::cout << "value: " <<std::endl;
+      std::cout << "pos->value: "<<pos->value<<std::endl;
+
+      if(isWithinBox(pNW, pSE, pos->location) && pos->value == value )
       {
+	std::cout << "isValidRow returned false" <<std::endl;
         return false;
       }
     }
-    
+    std::cout << "isValidRow returned true" <<std::endl;
     return true;
     
   }
