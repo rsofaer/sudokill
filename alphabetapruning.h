@@ -95,6 +95,8 @@ struct AlphaBetaPruning
             threadParams.maxDepth = maxDepth;
             threadParams.state = *state;
             threadParams.victoryIsMine = &victoryIsMine;
+            threadParams.dfsPlys.clear();
+            threadParams.dfsPlys.resize(maxDepth - 1);
           }
         }
       }
