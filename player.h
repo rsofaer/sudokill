@@ -43,9 +43,17 @@ public:
   /// <summary> Return the next move for the player. </summary>
   void NextMove(const Board& board, Cell* move)
   {
-    params.maxDepth = 3;
-    ShrinkPossibleMovesEvaluationFunc f;
-    AlphaBetaPruning::Run(&params, &const_cast<Board&>(board), &f, move);
+    // Pick a random spot if it's early in the game.
+    if(board.positions.size() < 2)
+    {
+      RandomPlayer rand;
+      rand.NextMove(board, move);
+    }else
+    {
+      params.maxDepth = 3;
+      ShrinkPossibleMovesEvaluationFunc f;
+      AlphaBetaPruning::Run(&params, &const_cast<Board&>(board), &f, move);
+    }
   }
 
 private:
