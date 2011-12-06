@@ -53,6 +53,30 @@ TEST(GenericBoard, isValidMove)
   EXPECT_TRUE(board.isValidMove(Point(0,0), 1));
   EXPECT_TRUE(board.isValidMove(Point(0,0), 9));
   EXPECT_TRUE(board.isValidMove(Point(Board::MaxX-1,Board::MaxY-1), 9));
+  
+  board.PlayMove(Point(0,0), 1);
+
+  // Sudoku invalid move:
+  EXPECT_FALSE(board.isValidMove(Point(0,0),2));
+  EXPECT_FALSE(board.isValidMove(Point(6,0),1));
+  EXPECT_FALSE(board.isValidMove(Point(0,6),1));
+  EXPECT_FALSE(board.isValidMove(Point(2,2),1));
+  // Sudokill invalid move:
+  EXPECT_FALSE(board.isValidMove(Point(4,4),2)); // Same row or column required.
+  EXPECT_FALSE(board.isValidMove(Point(2,2),2)); // Same box doesn't count.
+
+  EXPECT_TRUE(board.isValidMove(Point(1,0), 2));
+  EXPECT_TRUE(board.isValidMove(Point(0,1), 2));
+  EXPECT_TRUE(board.isValidMove(Point(0,8), 2));
+  
+}
+
+TEST(GenericBoard, isValidBox)
+{
+  Board board;
+  EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
+  board.PlayMove(Point(0,0), 1);
+  EXPECT_TRUE(board.isValidBox(Point(1,0), 2));
 }
 
 }
