@@ -33,12 +33,6 @@ struct Point
   {
     return (x == rhs.x && y == rhs.y);
   }
-
-  bool operator<=(const Point& rhs)
-  {
-    return (x <= rhs.x && y <= rhs.y);
-  }
-  
 };
 
 template <typename PointType>
@@ -80,6 +74,7 @@ struct GenericBoard
   {
     assert(p.x >= 0 && p.x < MaxX);
     assert(p.y >= 0 && p.y < MaxY);
+    assert(isValidMove(p, value));
     
     typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(),positions.end(),p);
     
@@ -122,7 +117,7 @@ struct GenericBoard
     return retVal;
   }
   
-  bool isValidMove(const Point<PointType> p, int value)
+  bool isValidMove(Point<PointType> p, int value)
   {
     assert(p.x >=0 && p.x <= MaxX);
     assert(p.y >= 0 && p.y <= MaxY);
@@ -130,7 +125,7 @@ struct GenericBoard
     return (isEmpty(p) &&
 	    isValidRow(p, value) &&
 	    isValidColumn(p, value) &&
-	    isValidGrid(p, value));
+	    isValidBox(p, value));
   }
 
   bool isValidRow(const Point<PointType>& p, int value)
@@ -166,14 +161,19 @@ struct GenericBoard
     return true;
   }
 
-  bool isValidGrid(const Point<PointType>& p, int value)
+  bool isWithinBox(const Point<PointType>& NW, const Point<PointType>& SE, const Point<PointType>& p)
+  {
+    return (p.x >= NW.x) && (p.x >= NW.y) && (p.x <= SE.x) && (p.y <= SE.y); 
+  }
+
+  bool isValidBox(const Point<PointType>& p, int value)
   {
     assert(p.x >=0 && p.x <= MaxX);
     assert(p.y >=0 && p.y <= MaxY);
     int gridMinX, gridMaxX;
     int gridMinY, gridMaxY;
     
-    int gridNumber = GridNumber(p);
+    int gridNumber = BoxNumber(p);
     switch(gridNumber)
     {
     case 1:
@@ -205,13 +205,13 @@ struct GenericBoard
       break;
     }
     
-    Point<PointType> pMin(gridMinX,gridMinY);
-    Point<PointType> pMax(gridMaxX,gridMaxY);
+    Point<PointType> pNW(gridMinX,gridMinY);
+    Point<PointType> pSE(gridMaxX,gridMaxY);
     
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end(); ++pos)
     {
-      if((*pos).location >= pMin && (*pos).location <= pMax && (*pos).value == value)
+      if(isWithinBox(pNW, pSE, (*pos).location))
       {
 	return false;
       }
@@ -221,7 +221,7 @@ struct GenericBoard
     
   }
 
-  int GridNumber(const Point<PointType>& p)
+  int BoxNumber(const Point<PointType>& p)
   {
     // point(3,1), grid:1
     // point(4,5), grid:5
