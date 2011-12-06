@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <functional>
 #include <assert.h>
+#include <iostream>
 
 namespace hps 
 {
@@ -103,7 +104,8 @@ struct GenericBoard
    <parameters> A generic point Point</parameters>
    <returns> Value at point p or -1 if the location is empty.</returns>
    */
-  inline int ValueAt(const Point<PointType> p)
+
+  inline int ValueAt(const Point<PointType>& p)
   {
     assert(p.x >= 0 && p.x < MaxX);
     assert(p.y >= 0 && p.y < MaxY);
@@ -119,7 +121,7 @@ struct GenericBoard
     return retVal;
   }
   
-  bool isValidMove(Point<PointType> p, int value)
+  bool isValidMove(const Point<PointType>& p, int value)
   {
     return ((p.x >=0 && p.x < MaxX) &&
             (p.y >= 0 && p.y < MaxY) &&
@@ -127,7 +129,30 @@ struct GenericBoard
             isValidValue(value) &&
 	          isValidRow(p, value) &&
 	          isValidColumn(p, value) &&
-	          isValidBox(p, value));
+	          isValidBox(p, value)) &&
+            isSameRowOrColumnIfPossible(p);
+  }
+
+  bool isSameRowOrColumnIfPossible(const Point<PointType>& p)
+  {
+    if(positions.size() == 0)
+    {
+      // Allow any move if this is the first move.
+      return true;
+    } else
+    {
+      Point<PointType> lastPlay = positions.back().location;
+      std::cout << "Last Play: (" << lastPlay.x << "," << lastPlay.y << ")\n";
+      std::cout << "This Play: (" << p.x << "," << p.y << ")\n";
+      if( (lastPlay.x == p.x) || (lastPlay.y == p.y)){
+        return true;
+      } else
+      {
+        // This is wrong.  We must check that there are possible moves
+        // within the row/column.
+        return false;
+      }
+    }
   }
 
   bool isValidValue(int value)
@@ -142,7 +167,7 @@ struct GenericBoard
     {
       if((*pos).location.y == p.y && (*pos).value == value)
       {
-	return false;
+        return false;
       }
     }
     return true;
@@ -155,7 +180,7 @@ struct GenericBoard
     {
       if((*pos).location.x == p.x && (*pos).value == value)
       {
-	      return false;
+        return false;
       }
     }
     return true;
@@ -164,7 +189,10 @@ struct GenericBoard
   bool isEmpty(const Point<PointType>& p)
   {
     typename std::vector<Cell<PointType> >::iterator pos = std::find(positions.begin(), positions.end(), p);
-    assert(pos == positions.end());
+    if(pos != positions.end())
+    {
+      return false;
+    }
     return true;
   }
 
@@ -173,62 +201,62 @@ struct GenericBoard
     return (p.x >= NW.x) && (p.x >= NW.y) && (p.x <= SE.x) && (p.y <= SE.y); 
   }
 
-  void getBoundingBox(int gridNumber, 
+  void getBoundingBox(int boxNumber, 
 		      Point<PointType>* pNW,
 		      Point<PointType>* pSE)
   {
-    int gridMinX, gridMaxX;
-    int gridMinY, gridMaxY;
+    int boxMinX, boxMaxX;
+    int boxMinY, boxMaxY;
     
-    switch(gridNumber)
+    switch(boxNumber)
     {
     case 1:
-      gridMinX = 0; gridMaxX = 2; gridMinY = 0; gridMaxY = 2; 
+      boxMinX = 0; boxMaxX = 2; boxMinY = 0; boxMaxY = 2; 
       break;
     case 2:
-      gridMinX = 3; gridMaxX = 5; gridMinY = 0; gridMaxY = 2;
+      boxMinX = 3; boxMaxX = 5; boxMinY = 0; boxMaxY = 2;
       break;
     case 3:
-      gridMinX = 6; gridMaxX = 8; gridMinY = 0; gridMaxY = 2; 
+      boxMinX = 6; boxMaxX = 8; boxMinY = 0; boxMaxY = 2; 
       break;
     case 4:
-      gridMinX = 0; gridMaxX = 2; gridMinY = 3; gridMaxY = 5;
+      boxMinX = 0; boxMaxX = 2; boxMinY = 3; boxMaxY = 5;
       break;
     case 5:
-      gridMinX = 3; gridMaxX = 5; gridMinY = 3; gridMaxY = 5; 
+      boxMinX = 3; boxMaxX = 5; boxMinY = 3; boxMaxY = 5; 
       break;
     case 6:
-      gridMinX = 6; gridMaxX = 8; gridMinY = 3; gridMaxY = 5;
+      boxMinX = 6; boxMaxX = 8; boxMinY = 3; boxMaxY = 5;
       break;
     case 7:
-      gridMinX = 0; gridMaxX = 2; gridMinY = 6; gridMaxY = 8; 
+      boxMinX = 0; boxMaxX = 2; boxMinY = 6; boxMaxY = 8; 
       break;
     case 8:
-      gridMinX = 3; gridMaxX = 5; gridMinY = 6; gridMaxY = 8;
+      boxMinX = 3; boxMaxX = 5; boxMinY = 6; boxMaxY = 8;
       break;
     case 9:
-      gridMinX = 6; gridMaxX = 8; gridMinY = 6; gridMaxY = 8; 
+      boxMinX = 6; boxMaxX = 8; boxMinY = 6; boxMaxY = 8; 
       break;
     }
-    pNW->x = gridMinX; pNW->y = gridMinY;
-    pSE->x = gridMaxX; pSE->y = gridMaxY;
+    pNW->x = boxMinX; pNW->y = boxMinY;
+    pSE->x = boxMaxX; pSE->y = boxMaxY;
   }
   bool isValidBox(const Point<PointType>& p, int value)
   {
     assert(p.x >=0 && p.x < MaxX);
     assert(p.y >=0 && p.y < MaxY);
     
-    int gridNumber = BoxNumber(p);
+    int boxNumber = BoxNumber(p);
     Point<PointType> pNW;
     Point<PointType> pSE;
-    getBoundingBox(gridNumber,&pNW,&pSE);
+    getBoundingBox(boxNumber,&pNW,&pSE);
 
     typename std::vector<Cell<PointType> >::iterator pos = positions.begin();
     for(; pos != positions.end(); ++pos)
     {
-      if(~isWithinBox(pNW, pSE, (*pos).location))
+      if(!isWithinBox(pNW, pSE, (*pos).location))
       {
-	return false;
+        return false;
       }
     }
     
