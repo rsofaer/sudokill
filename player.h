@@ -8,20 +8,21 @@ namespace hps
 namespace sudokill
 {
 
-  struct RandomPlayer
+struct RandomPlayer
+{
+  void NextMove(const Board& board, Cell* move)
   {
-    void NextMove(const Board& board, Cell* move)
+    Board::MoveList moves = board.ValidMoves();
+    if(moves.size() == 0) // We have lost!
     {
-      Board::MoveList moves = board.ValidMoves();
-      if(moves.size() == 0) // We have lost!
-      {
-        // Pick any empty cell.
-      }else
-      {
-        move = &(moves[math::RandBound(moves.size())]);
-      }
+      // Pick any empty cell.
+      board->RandomEmptyCell(move);
+    }else
+    {
+      move = &(moves[math::RandBound(moves.size())]);
     }
   }
+};
 
 /// <summary> Player using alpha-beta pruning. </summary>
 class AlphaBetaPlayer
