@@ -462,7 +462,7 @@ public:
   }
 
   /// <summary> Query number of moves made by players. </summary>
-  inline int NumberPlayerMoves() const
+  inline int GetPlayerMovesCount() const
   {
     return playerMoveCount;
   }
@@ -474,7 +474,7 @@ public:
   }
 
   /// <summary> Query the last move. </summary>
-  inline const Cell& LastMove() const
+  inline const Cell& GetLastMove() const
   {
     assert(playerMoveCount > 0);
     return positions.back();

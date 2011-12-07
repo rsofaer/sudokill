@@ -64,14 +64,30 @@ struct Parser
     assert(StateStringBegin() == line);
     const Cell premadeMoveSentinel(Point(-1, -1), -1);
     Cell cell;
+    Board::MoveList presets;
+    bool loadingPresets = true;
     for (;;)
     {
       if (!ReadNextLineNonEmpty(ssState, &line)) { return false; }
       if (StateStringEnd() == line) { break; }
       if (!ExtractCell(line, &cell)) { return false; }
+      // Detect end of presets.
       if (premadeMoveSentinel != cell)
       {
-        board->PlayMove(cell);
+        if (loadingPresets)
+        {
+          presets.push_back(cell);
+        }
+        else
+        {
+          board->PlayMove(cell);
+        }
+      }
+      // When presets finished, initialize board with them.
+      else
+      {
+        loadingPresets = false;
+        *board = Board(presets);
       }
     }
     return true;

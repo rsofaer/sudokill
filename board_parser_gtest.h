@@ -21,6 +21,10 @@ TEST(Parser, Parse)
   Board board;
   ASSERT_TRUE(Parser::Parse(stateString, &board));
   EXPECT_EQ(board.GetOccupied()[0], Cell(Point(0, 0), 5));
+  EXPECT_EQ(board.GetOccupied()[1], Cell(Point(0, 3), 4));
+  EXPECT_EQ(board.GetOccupied()[2], Cell(Point(4, 3), 8));
+  EXPECT_EQ(1, board.GetPlayerMovesCount());
+  EXPECT_EQ(board.GetLastMove(), Cell(Point(4, 3), 8));
 }
 
 }
