@@ -47,7 +47,7 @@ public:
     Board::MoveList sudokuMoves;
     board.SudokuValidMoves(&sudokuMoves);
     std::cout << "There are " << sudokuMoves.size() << " sudoku valid moves remaining." << std::endl;
-    if(sudokuMoves.size() > 50)
+    if(sudokuMoves.size() > 55)
     {
       RandomPlayer rand;
       rand.NextMove(board, move);
@@ -55,7 +55,7 @@ public:
     {
 
       #ifdef NDEBUG
-      params.maxDepth = 12;
+      params.maxDepth = 11;
       #else
       std::cout << "In Debug mode." << std::endl;
       params.maxDepth = 5;
