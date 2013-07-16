@@ -2,3 +2,14 @@ A Sudokill player.
 Brandon Reiss
 Akash Mehra
 Raphael Sofaer
+
+The following is Raphael Sofaer's outer CMakeLists file for building this project:
+
+		cmake_minimum_required(VERSION 2.8)
+
+		enable_language(CXX)
+		set(HPS_GTEST_ENABLED true)
+		set(GTEST_INCLUDE_DIRS
+		    "~/workspace/gtest/include")
+		add_subdirectory("./gtest")
+		add_subdirectory("./src")
